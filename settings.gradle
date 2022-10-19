@@ -1,0 +1,3 @@
+rootProject.name = 'nxcloud-foundation-core'
+include 'core-base'
+
