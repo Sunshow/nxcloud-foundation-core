@@ -1,12 +1,8 @@
 [versions]
 org-jetbrains-kotlin = "1.7.10"
-org-junit-jupiter = "5.9.1"
 org-springframework-boot = "2.7.4"
 
 [libraries]
 gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "org-jetbrains-kotlin" }
 gradlePlugin-springboot = { module = "org.springframework.boot:spring-boot-gradle-plugin", version.ref = "org-springframework-boot" }
-gradlePlugin-dependency-management = "io.spring.gradle:dependency-management-plugin:1.1.0"
-junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "org-junit-jupiter" }
-junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "org-junit-jupiter" }
-junit-vintage-engine = { module = "org.junit.vintage:junit-vintage-engine", version.ref = "org-junit-jupiter" }
+bom-springboot = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "org-springframework-boot" }
