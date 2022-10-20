@@ -1,21 +1,13 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+@Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     `java-library`
-}
-
-buildscript {
-    dependencies {
-        classpath(libs.gradlePlugin.kotlin)
-        classpath(libs.gradlePlugin.springboot)
-    }
-
-    repositories {
-        mavenCentral()
-        gradlePluginPortal()
-        google()
-    }
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.lombok) apply false
+    alias(libs.plugins.freefair.lombok) apply false
+    alias(libs.plugins.springboot) apply false
 }
 
 allprojects {
@@ -53,6 +45,8 @@ subprojects {
 
     apply(plugin = "java-library")
     apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "org.jetbrains.kotlin.plugin.lombok")
+    apply(plugin = "io.freefair.lombok")
 
     tasks.withType<JavaCompile> {
         options.encoding = Charsets.UTF_8.toString()
@@ -77,6 +71,7 @@ subprojects {
 
     tasks.withType<Test> {
         useJUnitPlatform()
+        @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
         jvmArgs = jvmArgs!! + listOf(
             "-XX:+HeapDumpOnOutOfMemoryError"
         )

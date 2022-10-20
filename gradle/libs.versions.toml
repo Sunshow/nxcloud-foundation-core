@@ -1,8 +1,14 @@
 [versions]
 org-jetbrains-kotlin = "1.7.10"
 org-springframework-boot = "2.7.4"
+io-freefair-lombok = "6.5.1"
+
 
 [libraries]
-gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "org-jetbrains-kotlin" }
-gradlePlugin-springboot = { module = "org.springframework.boot:spring-boot-gradle-plugin", version.ref = "org-springframework-boot" }
 bom-springboot = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "org-springframework-boot" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "org-jetbrains-kotlin" }
+kotlin-lombok = { id = "org.jetbrains.kotlin.plugin.lombok", version.ref = "org-jetbrains-kotlin" }
+freefair-lombok = { id = "io.freefair.lombok", version.ref = "io-freefair-lombok" }
+springboot = { id = "org.springframework.boot", version.ref = "org-springframework-boot" }
