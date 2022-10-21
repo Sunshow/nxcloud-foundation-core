@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     `java-library`
+    `maven-publish`
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.lombok) apply false
     alias(libs.plugins.freefair.lombok) apply false
@@ -12,7 +13,7 @@ plugins {
 
 allprojects {
     group = "nxcloud.foundation"
-    version = "1.0-SNAPSHOT"
+    version = "0.1.0-SNAPSHOT"
 
     repositories {
         mavenCentral()
@@ -101,6 +102,53 @@ subprojects {
         testImplementation("org.junit.jupiter:junit-jupiter-api")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
         testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
+    }
+
+}
+
+subprojects {
+    apply(plugin = "maven-publish")
+
+    publishing {
+
+        // 发布 release
+        // version = "1.0"
+
+        val sourcesJar by tasks.registering(Jar::class) {
+            archiveClassifier.set("sources")
+            from(sourceSets.main.get().allSource)
+        }
+
+        publications {
+            create<MavenPublication>("mavenJava") {
+                from(components["java"])
+
+                artifact(sourcesJar.get())
+            }
+        }
+
+        if (project.hasProperty("publishUsername") && project.hasProperty("publishPassword")
+            && project.hasProperty("publishReleasesRepoUrl") && project.hasProperty("publishSnapshotsRepoUrl")
+        ) {
+            repositories {
+                maven {
+                    val publishReleasesRepoUrl: String by project
+                    val publishSnapshotsRepoUrl: String by project
+
+                    url = uri(
+                        if (version.toString().endsWith("SNAPSHOT")) publishSnapshotsRepoUrl else publishReleasesRepoUrl
+                    )
+                    isAllowInsecureProtocol = true
+
+                    val publishUsername: String by project
+                    val publishPassword: String by project
+                    credentials {
+                        username = publishUsername
+                        password = publishPassword
+                    }
+                }
+            }
+        }
     }
 
 }
