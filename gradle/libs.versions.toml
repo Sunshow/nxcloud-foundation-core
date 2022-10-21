@@ -2,6 +2,7 @@
 org-jetbrains-kotlin = "1.7.10"
 org-springframework-boot = "2.7.4"
 io-freefair-lombok = "6.5.1"
+com-vanniktech-gradle-maven-publish = "0.22.0"
 
 
 [libraries]
@@ -12,3 +13,4 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "org-jetbrains-kot
 kotlin-lombok = { id = "org.jetbrains.kotlin.plugin.lombok", version.ref = "org-jetbrains-kotlin" }
 freefair-lombok = { id = "io.freefair.lombok", version.ref = "io-freefair-lombok" }
 springboot = { id = "org.springframework.boot", version.ref = "org-springframework-boot" }
+mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "com-vanniktech-gradle-maven-publish" }
