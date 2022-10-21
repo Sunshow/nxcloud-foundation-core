@@ -4,9 +4,11 @@ org-springframework-boot = "2.7.4"
 io-freefair-lombok = "6.5.1"
 com-vanniktech-gradle-maven-publish = "0.22.0"
 
-
 [libraries]
+javax-jaxb = { module = "javax.xml.bind:jaxb-api", version = "2.3.1" }
 bom-springboot = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "org-springframework-boot" }
+orika-core = { module = "ma.glasnost.orika:orika-core", version = "1.5.4" }
+dozer-core = { module = "com.github.dozermapper:dozer-core", version = "6.5.2" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "org-jetbrains-kotlin" }
