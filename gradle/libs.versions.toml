@@ -3,8 +3,10 @@ org-jetbrains-kotlin = "1.7.10"
 org-springframework-boot = "2.7.4"
 io-freefair-lombok = "6.5.1"
 com-vanniktech-gradle-maven-publish = "0.22.0"
+org-slf4j = "2.0.3"
 
 [libraries]
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "org-slf4j" }
 javax-jaxb = { module = "javax.xml.bind:jaxb-api", version = "2.3.1" }
 bom-springboot = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "org-springframework-boot" }
 orika-core = { module = "ma.glasnost.orika:orika-core", version = "1.5.4" }

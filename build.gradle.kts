@@ -96,8 +96,8 @@ subprojects {
     }
 
     dependencies {
-        compileOnly(platform(rootProject.libs.bom.springboot))
-        implementation("org.slf4j:slf4j-api")
+        // implementation(platform(rootProject.libs.bom.springboot))
+        implementation(rootProject.libs.slf4j.api)
         testImplementation("org.jetbrains.kotlin:kotlin-test")
         testImplementation("org.junit.jupiter:junit-jupiter-api")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
