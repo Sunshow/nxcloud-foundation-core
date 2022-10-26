@@ -78,17 +78,17 @@ class SnowFlakeIdGenerator(
         val workerId = leftId shr shiftWorker
         leftId -= workerId shl shiftWorker
         val sequence = leftId
-        return Extract(timestamp, centerId, workerId, sequence)
+        return Extract(timestamp + option.source.epoch.toEpochMilli(), centerId, workerId, sequence)
     }
 
     private fun handleSequenceOverflow() {
         when (option.strategy) {
             SequenceOverflowStrategy.ThrowException -> throw IllegalStateException("Sequence overflow")
-            SequenceOverflowStrategy.WaitUntilNextTick -> spinWaitForNextTick(lastTimestamp)
+            SequenceOverflowStrategy.WaitUntilNextTick -> waitForNextTick(lastTimestamp)
         }
     }
 
-    private fun spinWaitForNextTick(lastTimestamp: Long) {
+    private fun waitForNextTick(lastTimestamp: Long) {
         var timestamp: Long
         do {
             Thread.sleep(option.source.duration.toMillis())
@@ -163,10 +163,11 @@ class SnowFlakeIdGenerator(
 
             this.epoch = epoch
 
-            // Offset elapsed time by this amount (creation time of this time source since epoch)
-            offset = Instant.now().toEpochMilli() - epoch.toEpochMilli()
             // Record creation of this time source in milliseconds
-            start = System.currentTimeMillis()
+            start = Instant.now().toEpochMilli()
+
+            // Offset elapsed time by this moment (creation time of this time source since epoch)
+            offset = start - epoch.toEpochMilli()
         }
 
         override val ticks: Long
@@ -176,7 +177,7 @@ class SnowFlakeIdGenerator(
 
         private fun elapsed(): Long {
             // Calculate elapsed time since creation of this time source in milliseconds
-            return System.currentTimeMillis() - start
+            return Instant.now().toEpochMilli() - start
         }
 
         override fun toString(): String {
