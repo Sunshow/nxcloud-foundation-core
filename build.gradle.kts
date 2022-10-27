@@ -8,7 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.lombok) apply false
     alias(libs.plugins.freefair.lombok) apply false
-    alias(libs.plugins.springboot) apply false
+    // alias(libs.plugins.springboot) apply false
 }
 
 allprojects {
