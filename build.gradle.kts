@@ -6,6 +6,7 @@ plugins {
     `java-library`
     `maven-publish`
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.allopen)
     alias(libs.plugins.kotlin.lombok) apply false
     alias(libs.plugins.freefair.lombok) apply false
     // alias(libs.plugins.springboot) apply false
@@ -46,8 +47,18 @@ subprojects {
 
     apply(plugin = "java-library")
     apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "org.jetbrains.kotlin.plugin.allopen")
     apply(plugin = "org.jetbrains.kotlin.plugin.lombok")
     apply(plugin = "io.freefair.lombok")
+
+    allOpen {
+        annotations(
+            "javax.persistence.Entity",
+            "javax.persistence.MappedSuperclass",
+            "javax.persistence.Embedabble",
+            "org.springframework.context.annotation.Configuration",
+        )
+    }
 
     tasks.withType<JavaCompile> {
         options.encoding = Charsets.UTF_8.toString()

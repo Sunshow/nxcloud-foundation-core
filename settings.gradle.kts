@@ -5,6 +5,8 @@ include(":core-idgenerator")
 include(":core-data-support")
 include(":core-data-jpa")
 include(":core-spring-support")
+include(":core-spring-boot-autoconfigure")
+include(":core-spring-boot-starter")
 
 pluginManagement {
     repositories {

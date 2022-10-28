@@ -1,7 +1,7 @@
 [versions]
 org-jetbrains-kotlin = "1.7.10"
 org-springframework = { prefer = "5.3.23" }
-org-springframework-boot = { prefer = "2.7.4" }
+org-springframework-boot = { prefer = "2.7.5" }
 io-freefair-lombok = "6.5.1"
 com-vanniktech-gradle-maven-publish = "0.22.0"
 org-slf4j = "2.0.3"
@@ -11,11 +11,13 @@ slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "org-slf4j" }
 javax-jaxb = { module = "javax.xml.bind:jaxb-api", version = "2.3.1" }
 bom-springboot = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "org-springframework-boot" }
 spring-context = { module = "org.springframework:spring-context", version.ref = "org-springframework" }
+springboot-autoconfigure = { module = "org.springframework.boot:spring-boot-autoconfigure", version.ref = "org-springframework-boot" }
 orika-core = { module = "ma.glasnost.orika:orika-core", version = "1.5.4" }
 dozer-core = { module = "com.github.dozermapper:dozer-core", version = "6.5.2" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "org-jetbrains-kotlin" }
+kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "org-jetbrains-kotlin" }
 kotlin-lombok = { id = "org.jetbrains.kotlin.plugin.lombok", version.ref = "org-jetbrains-kotlin" }
 freefair-lombok = { id = "io.freefair.lombok", version.ref = "io-freefair-lombok" }
 springboot = { id = "org.springframework.boot", version.ref = "org-springframework-boot" }
