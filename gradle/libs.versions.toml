@@ -5,6 +5,7 @@ org-springframework-boot = { prefer = "2.7.5" }
 io-freefair-lombok = "6.5.1"
 com-vanniktech-gradle-maven-publish = "0.22.0"
 org-slf4j = "2.0.3"
+jakarta-persistence = "2.2.3"
 
 [libraries]
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "org-slf4j" }
@@ -14,6 +15,7 @@ spring-context = { module = "org.springframework:spring-context", version.ref = 
 springboot-autoconfigure = { module = "org.springframework.boot:spring-boot-autoconfigure", version.ref = "org-springframework-boot" }
 orika-core = { module = "ma.glasnost.orika:orika-core", version = "1.5.4" }
 dozer-core = { module = "com.github.dozermapper:dozer-core", version = "6.5.2" }
+jakarta-persistence-api = { module = "jakarta.persistence:jakarta.persistence-api", version.ref = "jakarta-persistence" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "org-jetbrains-kotlin" }

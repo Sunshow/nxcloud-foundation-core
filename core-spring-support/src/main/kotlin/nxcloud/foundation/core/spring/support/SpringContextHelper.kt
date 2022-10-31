@@ -1,5 +1,6 @@
 package nxcloud.foundation.core.spring.support
 
+import org.springframework.beans.factory.NoSuchBeanDefinitionException
 import org.springframework.context.ApplicationContext
 
 object SpringContextHelper {
@@ -25,6 +26,38 @@ object SpringContextHelper {
     @JvmStatic
     fun <T> getBean(beanName: String, clazz: Class<T>): T {
         return applicationContext.getBean(beanName, clazz)
+    }
+
+    @JvmStatic
+    fun <T> getBeanNullable(beanName: String): T? {
+        return try {
+            getBean(beanName)
+        } catch (e: NoSuchBeanDefinitionException) {
+            null
+        }
+    }
+
+    @JvmStatic
+    fun <T> getBeanNullable(clazz: Class<T>): T? {
+        return try {
+            getBean(clazz)
+        } catch (e: NoSuchBeanDefinitionException) {
+            null
+        }
+    }
+
+    @JvmStatic
+    fun <T> getBeanNullable(beanName: String, clazz: Class<T>): T? {
+        return try {
+            getBean(beanName, clazz)
+        } catch (e: NoSuchBeanDefinitionException) {
+            null
+        }
+    }
+
+    @JvmStatic
+    fun <T> getBeansOfType(clazz: Class<T>): Map<String, T> {
+        return applicationContext.getBeansOfType(clazz)
     }
 
 }
