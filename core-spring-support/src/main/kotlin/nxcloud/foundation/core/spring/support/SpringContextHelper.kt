@@ -2,6 +2,7 @@ package nxcloud.foundation.core.spring.support
 
 import org.springframework.beans.factory.NoSuchBeanDefinitionException
 import org.springframework.context.ApplicationContext
+import org.springframework.core.ResolvableType
 
 object SpringContextHelper {
 
@@ -58,6 +59,15 @@ object SpringContextHelper {
     @JvmStatic
     fun <T> getBeansOfType(clazz: Class<T>): Map<String, T> {
         return applicationContext.getBeansOfType(clazz)
+    }
+
+    @JvmStatic
+    fun <T> getBean(type: ResolvableType): T {
+        return applicationContext.getBeanNamesForType(type)
+            .first()
+            .let {
+                getBean(it)
+            }
     }
 
 }
