@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 @DataJpaTest
 @ImportAutoConfiguration(classes = [NXSpringSupportAutoConfiguration::class])
@@ -35,6 +36,24 @@ class EmployeeIntegrationTest {
 
         val found = employeeRepository.findByName(employee.name)
         assertNotNull(found)
+    }
+
+    @Test
+    fun testSoftDelete() {
+        val employee = Employee(name = "John")
+        entityManager.persist(employee)
+        entityManager.flush()
+
+        val found = employeeRepository.findByName(employee.name)
+        assertNotNull(found)
+        assertTrue { found.deleted == 0L }
+
+        found.deleted = System.currentTimeMillis()
+        employeeRepository.save(found)
+        employeeRepository.flush()
+
+        assertTrue { found.deleted > 0 }
+
     }
 }
 

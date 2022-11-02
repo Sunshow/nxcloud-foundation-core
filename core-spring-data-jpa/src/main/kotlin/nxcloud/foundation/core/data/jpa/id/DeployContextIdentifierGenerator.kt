@@ -31,7 +31,7 @@ class DeployContextIdentifierGenerator : IdentifierGenerator {
     }
 
     override fun generate(session: SharedSessionContractImplementor, obj: Any): Serializable {
-        logger.debug { "generate id: $obj" }
+        logger.debug { "generate id for $obj" }
 
 //        val generatorFactory = serviceRegistry.getService(MutableIdentifierGeneratorFactory::class.java)
 //
@@ -40,7 +40,12 @@ class DeployContextIdentifierGenerator : IdentifierGenerator {
 //
 //        return generator.generate(session, obj)
 
-        return identifierGenerator.nextId()
+        val next = identifierGenerator.nextId()
+
+        // logger out generated id
+        logger.debug { "generate id is $next" }
+        
+        return next
     }
 
     override fun configure(type: Type, params: Properties, serviceRegistry: ServiceRegistry) {
