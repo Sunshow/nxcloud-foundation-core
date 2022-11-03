@@ -56,6 +56,13 @@ class EmployeeIntegrationTest {
         assertNotNull(found)
         assertTrue { found.deleted == 0L }
 
+        employeeRepository.delete(found)
+        employeeRepository.flush()
+
+        assertTrue {
+            employeeService.findByName(employee.name) != null
+        }
+
         found.deleted = System.currentTimeMillis()
         employeeRepository.save(found)
         employeeRepository.flush()
