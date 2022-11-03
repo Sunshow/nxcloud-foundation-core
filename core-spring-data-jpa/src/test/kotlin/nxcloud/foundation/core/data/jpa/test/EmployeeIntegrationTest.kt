@@ -5,11 +5,14 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import org.springframework.context.annotation.Bean
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+
 
 @DataJpaTest
 @ImportAutoConfiguration(classes = [NXSpringSupportAutoConfiguration::class])
@@ -59,4 +62,15 @@ class EmployeeIntegrationTest {
 
 
 @SpringBootApplication
-class App
+class App {
+
+    @Bean
+    fun identifierGeneratorStrategyHibernatePropertiesCustomizer(): HibernatePropertiesCustomizer {
+        return HibernatePropertiesCustomizer {
+            it["hibernate.ejb.identifier_generator_strategy_provider"] =
+                    //"nxcloud.foundation.core.data.jpa.id.IdentityIdentifierGeneratorStrategyProvider"
+                "nxcloud.foundation.core.data.jpa.id.DeployContextIdentifierGeneratorStrategyProvider"
+        }
+    }
+
+}
