@@ -27,4 +27,15 @@ fun identifierGeneratorStrategyHibernatePropertiesCustomizer(): HibernatePropert
     }
 }
 
+// 自主指定主键
+@Bean
+fun identifierGeneratorStrategyHibernatePropertiesCustomizer(): HibernatePropertiesCustomizer {
+    return HibernatePropertiesCustomizer {
+        it["hibernate.ejb.identifier_generator_strategy_provider"] =
+            "nxcloud.foundation.core.data.jpa.id.AssignedIdentifierGeneratorStrategyProvider"
+    }
+}
+
 ```
+
+可参考实现完全自定义的机制
