@@ -4,6 +4,72 @@
 
 ### 引入依赖
 
+### 生命周期
+
+```kotlin
+interface EntityLifecycleListener {
+
+    fun onPrePersist(entity: Any) {
+
+    }
+
+    fun onPostPersist(entity: Any) {
+
+    }
+
+    fun onPreUpdate(entity: Any) {
+
+    }
+
+    fun onPostUpdate(entity: Any) {
+
+    }
+
+    fun onPreRemove(entity: Any) {
+
+    }
+
+    fun onPostRemove(entity: Any) {
+
+    }
+
+    fun onPostLoad(entity: Any) {
+
+    }
+
+}
+```
+
+#### 注册生命周期 Listener
+
+```kotlin
+/**
+ * 单个 Entity 注册生命周期监听
+ */
+data class EntityLifecycleListenerRegistrationBean(
+    val type: Class<Any>,
+    val listeners: List<EntityLifecycleListener>,
+    // 忽略前置默认监听
+    val ignorePre: Boolean = false,
+    // 忽略后置默认监听
+    val ignorePost: Boolean = false,
+)
+
+/**
+ * 全局 Entity 注册生命周期前置监听
+ */
+data class DefaultPreEntityLifecycleListenerRegistrationBean(
+    val listeners: List<EntityLifecycleListener>,
+)
+
+/**
+ * 全局 Entity 注册生命周期后置监听
+ */
+data class DefaultPostEntityLifecycleListenerRegistrationBean(
+    val listeners: List<EntityLifecycleListener>,
+)
+```
+
 ### 修改 `DefaultJpaEntity` 发号器
 
 通过 Hibernate 提供的 SPI 实现
