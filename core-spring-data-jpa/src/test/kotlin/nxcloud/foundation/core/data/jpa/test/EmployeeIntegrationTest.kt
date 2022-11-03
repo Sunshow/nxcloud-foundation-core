@@ -1,10 +1,12 @@
 package nxcloud.foundation.core.data.jpa.test
 
+import nxcloud.foundation.core.spring.boot.autoconfigure.support.NXSpringDataJpaAutoConfiguration
 import nxcloud.foundation.core.spring.boot.autoconfigure.support.NXSpringSupportAutoConfiguration
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.autoconfigure.aop.AopAutoConfiguration
 import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -15,7 +17,7 @@ import kotlin.test.assertTrue
 
 
 @DataJpaTest
-@ImportAutoConfiguration(classes = [NXSpringSupportAutoConfiguration::class])
+@ImportAutoConfiguration(classes = [AopAutoConfiguration::class, NXSpringSupportAutoConfiguration::class, NXSpringDataJpaAutoConfiguration::class])
 @AutoConfigureTestDatabase
 class EmployeeIntegrationTest {
 
@@ -24,6 +26,9 @@ class EmployeeIntegrationTest {
 
     @Autowired
     lateinit var employeeRepository: EmployeeRepository
+
+    @Autowired
+    lateinit var employeeService: EmployeeService
 
     @Test
     fun test() {
@@ -57,6 +62,10 @@ class EmployeeIntegrationTest {
 
         assertTrue { found.deleted > 0 }
 
+        assertTrue {
+            employeeService.findByName(employee.name) == null
+        }
+
     }
 }
 
@@ -72,6 +81,11 @@ class App {
                 "nxcloud.foundation.core.data.jpa.id.DeployContextIdentifierGeneratorStrategyProvider"
 //                "nxcloud.foundation.core.data.jpa.id.AssignedIdentifierGeneratorStrategyProvider"
         }
+    }
+
+    @Bean
+    fun employeeService(employeeRepository: EmployeeRepository): EmployeeService {
+        return EmployeeServiceImpl(employeeRepository)
     }
 
 }

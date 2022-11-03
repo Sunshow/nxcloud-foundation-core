@@ -6,4 +6,5 @@ object JpaConstants {
 
     const val ID_GENERATOR_STRATEGY = "NX_STRATEGY"
 
+    const val FILTER_SOFT_DELETE = "NX_FILTER_SOFT_DELETE"
 }

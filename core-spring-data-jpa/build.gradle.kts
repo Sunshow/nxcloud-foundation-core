@@ -1,3 +1,5 @@
+apply(plugin = "org.jetbrains.kotlin.plugin.spring")
+
 dependencies {
     api(project(":core-data-support"))
     api(project(":core-spring-support"))
@@ -9,5 +11,6 @@ dependencies {
     testImplementation(project(":core-spring-boot-starter"))
     testImplementation(libs.springboot.starter.test)
     testImplementation(libs.springboot.starter.data.jpa)
+    testImplementation(libs.springboot.starter.aop)
     testImplementation(libs.h2)
 }

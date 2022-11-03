@@ -105,3 +105,30 @@ fun identifierGeneratorStrategyHibernatePropertiesCustomizer(): HibernatePropert
 ```
 
 可参考实现完全自定义的机制
+
+### 软删除
+
+软删除的实现基于 `Hibernate Filter` 和 `AOP`
+
+```kotlin
+// build.gradle.kts 应用 kotlin spring aop 插件
+apply(plugin = "org.jetbrains.kotlin.plugin.spring")
+
+// 继承父类
+@Entity
+@Table(name = "test_employee")
+class Employee(
+    var name: String,
+) : SoftDeleteJpaEntity()
+
+// 在需要启用软删除支持的类或者方法中添加注解
+@EnableSoftDelete
+@Service
+class EmployeeServiceImpl(private val employeeRepository: EmployeeRepository) : EmployeeService {
+
+    override fun findByName(name: String): Employee? {
+        return employeeRepository.findByName(name)
+    }
+
+}
+```

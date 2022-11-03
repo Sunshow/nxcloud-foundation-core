@@ -13,12 +13,13 @@ import nxcloud.foundation.core.idgenerator.impl.snowflake.SnowFlakeIdGenerator
 import nxcloud.foundation.core.idgenerator.impl.snowflake.SnowFlakeIdGeneratorFacadeImpl
 import nxcloud.foundation.core.spring.support.SpringContextHelperAware
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @ConditionalOnClass(SpringContextHelperAware::class)
 class NXSpringSupportAutoConfiguration {
 
