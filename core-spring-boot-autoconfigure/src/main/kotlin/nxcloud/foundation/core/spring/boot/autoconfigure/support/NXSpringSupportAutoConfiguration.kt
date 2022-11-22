@@ -52,7 +52,8 @@ class NXSpringSupportAutoConfiguration {
         )
     }
 
-    @Configuration(proxyBeanMethods = false)
+    @Configuration
+    @ConditionalOnMissingBean(BeanMapperFacade::class)
     @ConditionalOnClass(MapperFactory::class)
     internal class OrikaBeanMapperFacadeImplConfiguration {
         @Bean
@@ -68,7 +69,8 @@ class NXSpringSupportAutoConfiguration {
         }
     }
 
-    @Configuration(proxyBeanMethods = false)
+    @Configuration
+    @ConditionalOnMissingBean(BeanMapperFacade::class)
     @ConditionalOnClass(Mapper::class)
     internal class DozerBeanMapperFacadeImplConfiguration {
         @Bean
