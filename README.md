@@ -1,5 +1,27 @@
 # nxcloud-foundation-core
 
+## Base
+
+### 枚举
+
+使用 `kotlin` 密封类实现了更为强大和便于使用的枚举
+
+预置枚举：
+
+- YesNoStatus
+
+#### 定义枚举
+
+```kotlin
+sealed class YesNoStatus(
+    value: Int,
+    name: String,
+) : IntSealedEnum(value, name) {
+    object Yes : YesNoStatus(1, "是")
+    object No : YesNoStatus(0, "否")
+}
+```
+
 ## JPA
 
 ### 引入依赖
