@@ -10,6 +10,7 @@ import org.hibernate.internal.SessionFactoryImpl
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
+import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
 import javax.annotation.PostConstruct
@@ -18,6 +19,7 @@ import javax.persistence.EntityManagerFactory
 
 @AutoConfiguration(after = [NXSpringSupportAutoConfiguration::class, SpringContextHelper::class])
 @ConditionalOnClass(SpringContextHelper::class, SessionImplementor::class)
+@EntityScan(basePackages = ["nxcloud.foundation.core.data.jpa.converter.base"])
 class NXSpringDataJpaAutoConfiguration {
 
     @Bean
