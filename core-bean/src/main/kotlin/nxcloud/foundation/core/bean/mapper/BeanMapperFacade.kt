@@ -1,5 +1,6 @@
 package nxcloud.foundation.core.bean.mapper
 
+import com.github.dozermapper.core.Mapper
 import nxcloud.foundation.core.base.exception.NXRuntimeException
 
 /**
@@ -12,6 +13,20 @@ interface BeanMapperFacade {
     fun <S, D> mapNullable(sourceObject: S?, destinationClass: Class<D>): D? {
         return sourceObject?.let { map(it, destinationClass) }
     }
+
+    fun <S, D> mapList(source: Collection<S>, destinationClass: Class<D>): List<D> =
+        source.map { map(it, destinationClass) }
+
+    fun <S, D> mapList(
+        source: Collection<S>,
+        destinationClass: Class<D>,
+        consumer: (S, D) -> Unit
+    ): List<D> =
+        source.map {
+            val t = map(it, destinationClass)
+            consumer(it, t)
+            t
+        }
 
 }
 
