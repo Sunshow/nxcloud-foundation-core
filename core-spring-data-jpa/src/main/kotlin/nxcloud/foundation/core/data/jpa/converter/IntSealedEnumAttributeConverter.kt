@@ -1,7 +1,7 @@
 package nxcloud.foundation.core.data.jpa.converter
 
 import nxcloud.foundation.core.lang.enumeration.IntSealedEnum
-import nxcloud.foundation.core.lang.exception.InvalidSealedEnumException
+import nxcloud.foundation.core.lang.exception.SealedEnumUnrecognizedException
 import javax.persistence.AttributeConverter
 import kotlin.reflect.KClass
 
@@ -55,7 +55,7 @@ abstract class NonnullIntSealedEnumAttributeConverter<T : IntSealedEnum> : Attri
             val kClass =
                 this::class.supertypes.first { it.classifier == NonnullIntSealedEnumAttributeConverter::class }.arguments.first().type!!.classifier as KClass<T>
             IntSealedEnum.valueOf(kClass.java, data)
-        } ?: throw InvalidSealedEnumException("Invalid sealed enum value: $dbData")
+        } ?: throw SealedEnumUnrecognizedException("Unrecognized sealed enum value: $dbData")
     }
 
 }
