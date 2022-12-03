@@ -1,6 +1,6 @@
 package nxcloud.foundation.core.idgenerator
 
-import nxcloud.foundation.core.base.exception.NXRuntimeException
+import nxcloud.foundation.core.lang.exception.NXRuntimeException
 import java.io.Serializable
 
 /**

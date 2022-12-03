@@ -1,6 +1,7 @@
 package nxcloud.foundation.core.data.jpa.converter
 
 import nxcloud.foundation.core.lang.enumeration.IntSealedEnum
+import nxcloud.foundation.core.lang.exception.InvalidSealedEnumException
 import javax.persistence.AttributeConverter
 import kotlin.reflect.KClass
 
@@ -21,7 +22,7 @@ abstract class NullableIntSealedEnumAttributeConverter<T : IntSealedEnum> : Attr
 
 }
 
-abstract class NonnullIntSealedEnumAttributeConverter<T : IntSealedEnum> : AttributeConverter<T, Int> {
+abstract class ConvertIfNullIntSealedEnumAttributeConverter<T : IntSealedEnum> : AttributeConverter<T, Int> {
 
     override fun convertToDatabaseColumn(attribute: T?): Int {
         return attribute?.value ?: convertToDatabaseColumnIfNull()
@@ -39,5 +40,22 @@ abstract class NonnullIntSealedEnumAttributeConverter<T : IntSealedEnum> : Attri
     }
 
     protected abstract fun convertToEntityAttributeIfNull(): T
+
+}
+
+abstract class NonnullIntSealedEnumAttributeConverter<T : IntSealedEnum> : AttributeConverter<T, Int> {
+
+    override fun convertToDatabaseColumn(attribute: T): Int {
+        return attribute.value
+    }
+
+    override fun convertToEntityAttribute(dbData: Int): T {
+        return dbData.let { data ->
+            @Suppress("UNCHECKED_CAST")
+            val kClass =
+                this::class.supertypes.first { it.classifier == NonnullIntSealedEnumAttributeConverter::class }.arguments.first().type!!.classifier as KClass<T>
+            IntSealedEnum.valueOf(kClass.java, data)
+        } ?: throw InvalidSealedEnumException("Invalid sealed enum value: $dbData")
+    }
 
 }

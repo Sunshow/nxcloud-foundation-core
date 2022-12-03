@@ -1,7 +1,6 @@
 package nxcloud.foundation.core.bean.mapper
 
-import com.github.dozermapper.core.Mapper
-import nxcloud.foundation.core.base.exception.NXRuntimeException
+import nxcloud.foundation.core.lang.exception.NXRuntimeException
 
 /**
  * 对象拷贝和映射工厂的接口
