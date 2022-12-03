@@ -1,6 +1,8 @@
 package nxcloud.foundation.core.lang.enumeration
 
-sealed class SealedEnum
+import java.io.Serializable
+
+sealed class SealedEnum : Serializable
 
 abstract class IntSealedEnum(
     val value: Int,

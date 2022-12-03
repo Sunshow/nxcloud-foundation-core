@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.domain.EntityScan
+import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
 import javax.annotation.PostConstruct
@@ -21,6 +22,15 @@ import javax.persistence.EntityManagerFactory
 @ConditionalOnClass(SpringContextHelper::class, SessionImplementor::class)
 @EntityScan(basePackages = ["nxcloud.foundation.core.data.jpa.converter.base"])
 class NXSpringDataJpaAutoConfiguration {
+
+    @Bean
+    @ConditionalOnMissingBean(name = ["identifierGeneratorStrategyHibernatePropertiesCustomizer"])
+    fun identifierGeneratorStrategyHibernatePropertiesCustomizer(): HibernatePropertiesCustomizer {
+        return HibernatePropertiesCustomizer {
+            it["hibernate.identifier_generator_strategy_provider"] =
+                "nxcloud.foundation.core.data.jpa.id.DeployContextIdentifierGeneratorStrategyProvider"
+        }
+    }
 
     @Bean
     @ConditionalOnMissingBean(SoftDeleteFilterAdvice::class)
