@@ -32,9 +32,9 @@ interface BeanMapperFacade {
 /**
  * 为 kotlin 扩展便于调用的方法
  */
-inline fun <S, reified D> (BeanMapperFacade).map(sourceObject: S): D {
-    return map(sourceObject, D::class.java)
-}
+inline fun <reified D> (BeanMapperFacade).map(sourceObject: Any): D = map(sourceObject, D::class.java)
+
+inline fun <reified D> (BeanMapperFacade).mapList(source: Collection<Any>): List<D> = mapList(source, D::class.java)
 
 open class BeanMappingException(
     message: String,
