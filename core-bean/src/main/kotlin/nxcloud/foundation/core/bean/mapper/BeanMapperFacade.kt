@@ -29,6 +29,13 @@ interface BeanMapperFacade {
 
 }
 
+/**
+ * 为 kotlin 扩展便于调用的方法
+ */
+inline fun <S, reified D> (BeanMapperFacade).map(sourceObject: S): D {
+    return map(sourceObject, D::class.java)
+}
+
 open class BeanMappingException(
     message: String,
     cause: Throwable? = null
