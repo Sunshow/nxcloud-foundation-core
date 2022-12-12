@@ -34,7 +34,7 @@ abstract class ConvertIfNullIntSealedEnumAttributeConverter<T : IntSealedEnum> :
         return dbData?.let { data ->
             @Suppress("UNCHECKED_CAST")
             val kClass =
-                this::class.supertypes.first { it.classifier == NonnullIntSealedEnumAttributeConverter::class }.arguments.first().type!!.classifier as KClass<T>
+                this::class.supertypes.first { it.classifier == ConvertIfNullIntSealedEnumAttributeConverter::class }.arguments.first().type!!.classifier as KClass<T>
             IntSealedEnum.valueOf(kClass.java, data)
         } ?: convertToEntityAttributeIfNull()
     }
