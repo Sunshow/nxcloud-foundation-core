@@ -8,4 +8,4 @@ import java.io.Serializable
  * author: sunshow.
  */
 @NoRepositoryBean
-interface JpaRepository<T, ID : Serializable> : Repository<T, ID>
+interface EmptyJpaRepository<T, ID : Serializable> : Repository<T, ID>
