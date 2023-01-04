@@ -9,6 +9,7 @@ jakarta-persistence = "2.2.3"
 kotlin-logging-jvm = "2.1.23"
 com-h2database = "2.1.214"
 ch-qos-logback = { prefer = "1.4.4" }
+com-fasterxml-jackson-core = { prefer = "2.14.1" }
 
 [libraries]
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "org-slf4j" }
@@ -27,6 +28,9 @@ jakarta-persistence-api = { module = "jakarta.persistence:jakarta.persistence-ap
 kotlin-logging-jvm = { module = "io.github.microutils:kotlin-logging-jvm", version.ref = "kotlin-logging-jvm" }
 h2 = { module = "com.h2database:h2", version.ref = "com-h2database" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "ch-qos-logback" }
+jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "com-fasterxml-jackson-core" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "com-fasterxml-jackson-core" }
+jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "com-fasterxml-jackson-core" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "org-jetbrains-kotlin" }
