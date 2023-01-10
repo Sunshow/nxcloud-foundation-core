@@ -6,10 +6,10 @@ import kotlin.test.assertEquals
 internal class PhoneNumberHelperTest {
 
     @Test
-    fun testIsValid() {
-        assertEquals(false, PhoneNumberHelper.isValid("12345678901"))
-        assertEquals(true, PhoneNumberHelper.isValid("13800000000"))
-        assertEquals(true, PhoneNumberHelper.isValid("15623671234"))
+    fun testIsValidMobile() {
+        assertEquals(false, PhoneNumberHelper.isValidMobile("12345678901"))
+        assertEquals(true, PhoneNumberHelper.isValidMobile("13800000000"))
+        assertEquals(true, PhoneNumberHelper.isValidMobile("15623671234"))
     }
 
 }
