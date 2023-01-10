@@ -6,10 +6,13 @@ io-freefair-lombok = "6.5.1"
 com-vanniktech-gradle-maven-publish = "0.22.0"
 org-slf4j = { prefer = "1.7.36" }
 jakarta-persistence = "2.2.3"
+jakarta-validation = { prefer = "2.0.2" }
 kotlin-logging-jvm = "2.1.23"
 com-h2database = "2.1.214"
 ch-qos-logback = { prefer = "1.4.4" }
 com-fasterxml-jackson-core = { prefer = "2.14.1" }
+org-hibernate-validator = { prefer = "6.2.5.Final" }
+org-glassfish-javax-el = { prefer = "3.0.1-b12" }
 
 [libraries]
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "org-slf4j" }
@@ -25,12 +28,15 @@ springboot-starter-aop = { module = "org.springframework.boot:spring-boot-starte
 orika-core = { module = "ma.glasnost.orika:orika-core", version = "1.5.4" }
 dozer-core = { module = "com.github.dozermapper:dozer-core", version = "6.5.2" }
 jakarta-persistence-api = { module = "jakarta.persistence:jakarta.persistence-api", version.ref = "jakarta-persistence" }
+jakarta-validation-api = { module = "jakarta.validation:jakarta.validation-api", version.ref = "jakarta-validation" }
 kotlin-logging-jvm = { module = "io.github.microutils:kotlin-logging-jvm", version.ref = "kotlin-logging-jvm" }
 h2 = { module = "com.h2database:h2", version.ref = "com-h2database" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "ch-qos-logback" }
 jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "com-fasterxml-jackson-core" }
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "com-fasterxml-jackson-core" }
 jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "com-fasterxml-jackson-core" }
+hibernate-validator = { module = "org.hibernate.validator:hibernate-validator", version.ref = "org-hibernate-validator" }
+glassfish-javax-el = { module = "org.glassfish:javax.el", version.ref = "org-glassfish-javax-el" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "org-jetbrains-kotlin" }

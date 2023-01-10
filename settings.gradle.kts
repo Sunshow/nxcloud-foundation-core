@@ -2,6 +2,7 @@ rootProject.name = "nxcloud-foundation-core"
 include(":core-base")
 include(":core-bean")
 include(":core-idgenerator")
+include(":core-validation")
 include(":core-json")
 include(":core-json-jackson")
 include(":core-data-support")
