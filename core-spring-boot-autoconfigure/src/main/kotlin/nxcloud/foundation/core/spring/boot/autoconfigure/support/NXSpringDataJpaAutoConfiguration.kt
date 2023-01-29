@@ -4,10 +4,12 @@ import nxcloud.foundation.core.data.jpa.aop.SoftDeleteAdvisor
 import nxcloud.foundation.core.data.jpa.aop.SoftDeleteFilterAdvice
 import nxcloud.foundation.core.data.jpa.event.SoftDeleteEventListener
 import nxcloud.foundation.core.spring.support.SpringContextHelper
+import org.aopalliance.aop.Advice
 import org.hibernate.engine.spi.SessionImplementor
 import org.hibernate.event.service.spi.EventListenerRegistry
 import org.hibernate.event.spi.EventType
 import org.hibernate.internal.SessionFactoryImpl
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -34,14 +36,14 @@ class NXSpringDataJpaAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(SoftDeleteFilterAdvice::class)
+    @ConditionalOnMissingBean(name = ["softDeleteFilterAdvice"])
     fun softDeleteFilterAdvice(): SoftDeleteFilterAdvice {
         return SoftDeleteFilterAdvice()
     }
 
     @Bean
     @ConditionalOnMissingBean(SoftDeleteAdvisor::class)
-    fun softDeleteAdvisor(advice: SoftDeleteFilterAdvice): SoftDeleteAdvisor {
+    fun softDeleteAdvisor(@Qualifier("softDeleteFilterAdvice") advice: Advice): SoftDeleteAdvisor {
         return SoftDeleteAdvisor(advice)
     }
 

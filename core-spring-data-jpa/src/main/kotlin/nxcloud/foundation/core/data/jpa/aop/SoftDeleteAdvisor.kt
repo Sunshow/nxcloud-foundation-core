@@ -13,8 +13,10 @@ open class SoftDeleteAdvisor(advice: Advice) : StaticMethodMatcherPointcutAdviso
     }
 
     override fun matches(method: Method, targetClass: Class<*>): Boolean {
-        val a = AnnotationUtils.findAnnotation(targetClass, EnableSoftDelete::class.java)
-        if (a != null) {
+        if (AnnotationUtils.findAnnotation(method, EnableSoftDelete::class.java) != null) {
+            return true
+        }
+        if (AnnotationUtils.findAnnotation(targetClass, EnableSoftDelete::class.java) != null) {
             return true
         }
         return false
