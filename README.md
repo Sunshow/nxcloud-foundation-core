@@ -1,5 +1,7 @@
 # nxcloud-foundation-core
 
+![image](https://img.shields.io/maven-central/v/net.sunshow.nxcloud/nxcloud-core-base)
+
 ## Base
 
 ### 枚举
