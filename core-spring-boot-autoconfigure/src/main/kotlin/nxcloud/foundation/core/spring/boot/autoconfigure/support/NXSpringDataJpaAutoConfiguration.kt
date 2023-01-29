@@ -1,5 +1,6 @@
 package nxcloud.foundation.core.spring.boot.autoconfigure.support
 
+import nxcloud.foundation.core.data.jpa.aop.SoftDeleteAdvisor
 import nxcloud.foundation.core.data.jpa.aop.SoftDeleteFilterAdvice
 import nxcloud.foundation.core.data.jpa.event.SoftDeleteEventListener
 import nxcloud.foundation.core.spring.support.SpringContextHelper
@@ -36,6 +37,12 @@ class NXSpringDataJpaAutoConfiguration {
     @ConditionalOnMissingBean(SoftDeleteFilterAdvice::class)
     fun softDeleteFilterAdvice(): SoftDeleteFilterAdvice {
         return SoftDeleteFilterAdvice()
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(SoftDeleteAdvisor::class)
+    fun softDeleteAdvisor(advice: SoftDeleteFilterAdvice): SoftDeleteAdvisor {
+        return SoftDeleteAdvisor(advice)
     }
 
     @Bean

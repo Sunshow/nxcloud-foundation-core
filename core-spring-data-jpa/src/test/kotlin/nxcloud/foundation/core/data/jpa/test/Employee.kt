@@ -28,12 +28,16 @@ interface EmployeeService {
     fun findByName(name: String): Employee?
 }
 
+// 测试注解加在父类
 @EnableSoftDelete
-@Service
-class EmployeeServiceImpl(private val employeeRepository: EmployeeRepository) : EmployeeService {
+abstract class EmployeeServiceImpl(private val employeeRepository: EmployeeRepository) : EmployeeService {
 
     override fun findByName(name: String): Employee? {
         return employeeRepository.findByName(name)
     }
 
 }
+
+@Service
+class ChildEmployeeServiceImpl(employeeRepository: EmployeeRepository) :
+    EmployeeServiceImpl(employeeRepository)

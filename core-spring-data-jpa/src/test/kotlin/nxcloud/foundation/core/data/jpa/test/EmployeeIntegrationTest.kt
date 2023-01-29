@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.aop.AopAutoConfiguration
+import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -17,6 +18,7 @@ import kotlin.test.assertTrue
 
 
 @DataJpaTest
+@EntityScan
 @ImportAutoConfiguration(classes = [AopAutoConfiguration::class, NXSpringSupportAutoConfiguration::class, NXSpringDataJpaAutoConfiguration::class])
 @AutoConfigureTestDatabase
 class EmployeeIntegrationTest {
@@ -92,7 +94,7 @@ class App {
 
     @Bean
     fun employeeService(employeeRepository: EmployeeRepository): EmployeeService {
-        return EmployeeServiceImpl(employeeRepository)
+        return ChildEmployeeServiceImpl(employeeRepository)
     }
 
 }
