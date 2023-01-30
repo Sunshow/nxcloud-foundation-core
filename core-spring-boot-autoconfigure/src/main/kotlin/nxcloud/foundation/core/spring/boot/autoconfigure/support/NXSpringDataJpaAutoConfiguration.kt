@@ -37,8 +37,8 @@ class NXSpringDataJpaAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(name = ["softDeleteFilterAdvice"])
-    fun softDeleteFilterAdvice(): SoftDeleteFilterAdvice {
-        return SoftDeleteFilterAdvice()
+    fun softDeleteFilterAdvice(entityManagerFactory: EntityManagerFactory): SoftDeleteFilterAdvice {
+        return SoftDeleteFilterAdvice(entityManagerFactory)
     }
 
     @Bean
