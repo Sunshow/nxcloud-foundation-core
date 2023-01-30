@@ -15,6 +15,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer
+import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
 import javax.annotation.PostConstruct
@@ -37,8 +38,11 @@ class NXSpringDataJpaAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(name = ["softDeleteFilterAdvice"])
-    fun softDeleteFilterAdvice(entityManagerFactory: EntityManagerFactory): SoftDeleteFilterAdvice {
-        return SoftDeleteFilterAdvice(entityManagerFactory)
+    fun softDeleteFilterAdvice(
+        entityManagerFactory: EntityManagerFactory,
+        jpaProperties: JpaProperties,
+    ): SoftDeleteFilterAdvice {
+        return SoftDeleteFilterAdvice(entityManagerFactory, jpaProperties)
     }
 
     @Bean

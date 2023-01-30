@@ -5,6 +5,7 @@ import nxcloud.foundation.core.data.jpa.constant.JpaConstants
 import org.aopalliance.intercept.MethodInterceptor
 import org.aopalliance.intercept.MethodInvocation
 import org.hibernate.Session
+import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties
 import org.springframework.orm.jpa.EntityManagerFactoryUtils
 import org.springframework.orm.jpa.EntityManagerHolder
 import org.springframework.transaction.support.TransactionSynchronizationManager
@@ -12,7 +13,8 @@ import javax.persistence.EntityManagerFactory
 
 
 open class SoftDeleteFilterAdvice(
-    private val entityManagerFactory: EntityManagerFactory
+    private val entityManagerFactory: EntityManagerFactory,
+    private val jpaProperties: JpaProperties,
 ) : MethodInterceptor {
 
     private val logger = KotlinLogging.logger {}
@@ -21,11 +23,11 @@ open class SoftDeleteFilterAdvice(
         // 执行前可能当前线程还未绑定 EntityManager (例如关闭了 OpenSessionInView 情况), 所以这里需要手动确保获取EntityManager并绑定到当前线程
         val entityManager = EntityManagerFactoryUtils.getTransactionalEntityManager(
             entityManagerFactory,
-            entityManagerFactory.properties
+            jpaProperties.properties
         )
             ?: run {
                 logger.debug { "当前线程还未绑定 EntityManager, 自动创建并绑定" }
-                val em = entityManagerFactory.createEntityManager(entityManagerFactory.properties)
+                val em = entityManagerFactory.createEntityManager(jpaProperties.properties)
                 TransactionSynchronizationManager.bindResource(entityManagerFactory, EntityManagerHolder(em))
                 em
             }

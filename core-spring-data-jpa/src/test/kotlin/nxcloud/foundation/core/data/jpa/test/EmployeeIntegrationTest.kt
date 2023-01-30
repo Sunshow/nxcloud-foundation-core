@@ -85,7 +85,7 @@ class App {
     @Bean
     fun identifierGeneratorStrategyHibernatePropertiesCustomizer(): HibernatePropertiesCustomizer {
         return HibernatePropertiesCustomizer {
-            it["hibernate.ejb.identifier_generator_strategy_provider"] =
+            it["hibernate.identifier_generator_strategy_provider"] =
 //                "nxcloud.foundation.core.data.jpa.id.IdentityIdentifierGeneratorStrategyProvider"
                 "nxcloud.foundation.core.data.jpa.id.DeployContextIdentifierGeneratorStrategyProvider"
 //                "nxcloud.foundation.core.data.jpa.id.AssignedIdentifierGeneratorStrategyProvider"
