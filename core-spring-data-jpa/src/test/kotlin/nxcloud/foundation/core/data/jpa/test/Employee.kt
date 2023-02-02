@@ -7,6 +7,7 @@ import org.hibernate.annotations.DynamicUpdate
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import javax.persistence.Entity
 import javax.persistence.Table
 
@@ -26,9 +27,11 @@ interface EmployeeRepository : JpaRepository<Employee, Long> {
 
 interface EmployeeService {
     fun findByName(name: String): Employee?
+
+    fun updateByName(from: String, to: String)
 }
 
-abstract class EmployeeServiceImpl(private val employeeRepository: EmployeeRepository) : EmployeeService {
+abstract class EmployeeServiceImpl(protected val employeeRepository: EmployeeRepository) : EmployeeService {
 
     override fun findByName(name: String): Employee? {
         return employeeRepository.findByName(name)
@@ -40,4 +43,14 @@ abstract class EmployeeServiceImpl(private val employeeRepository: EmployeeRepos
 @EnableSoftDelete
 @Service
 class ChildEmployeeServiceImpl(employeeRepository: EmployeeRepository) :
-    EmployeeServiceImpl(employeeRepository)
+    EmployeeServiceImpl(employeeRepository) {
+
+    @Transactional
+    override fun updateByName(from: String, to: String) {
+        employeeRepository.findByName(from)
+            ?.apply {
+                name = to
+            }
+    }
+
+}

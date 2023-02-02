@@ -1,5 +1,6 @@
 package nxcloud.foundation.core.data.jpa.test
 
+import nxcloud.foundation.core.data.support.listener.DefaultPostEntityLifecycleListenerRegistrationBean
 import nxcloud.foundation.core.spring.boot.autoconfigure.support.NXSpringDataJpaAutoConfiguration
 import nxcloud.foundation.core.spring.boot.autoconfigure.support.NXSpringSupportAutoConfiguration
 import org.junit.jupiter.api.Test
@@ -13,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.context.annotation.Bean
+import org.springframework.test.annotation.Rollback
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -76,6 +78,23 @@ class EmployeeIntegrationTest {
         }
 
     }
+
+    @Rollback(true)
+    @Test
+    fun testTransactionAndLifecycle() {
+        val employee = Employee(name = "John")
+        entityManager.persist(employee)
+        entityManager.flush()
+
+        assertTrue {
+            employeeService.findByName(employee.name) != null
+        }
+
+        employeeService.updateByName("John", "Tom")
+        assertTrue {
+            employeeService.findByName("Tom") != null
+        }
+    }
 }
 
 
@@ -95,6 +114,18 @@ class App {
     @Bean
     fun employeeService(employeeRepository: EmployeeRepository): EmployeeService {
         return ChildEmployeeServiceImpl(employeeRepository)
+    }
+
+    @Bean
+    fun postUpdateEntityLifecycleListener(): PostUpdateEntityLifecycleListener {
+        return PostUpdateEntityLifecycleListener()
+    }
+
+    @Bean
+    fun defaultPostEntityLifecycleListenerRegistrationBean(): DefaultPostEntityLifecycleListenerRegistrationBean {
+        return DefaultPostEntityLifecycleListenerRegistrationBean(
+            listOf(postUpdateEntityLifecycleListener())
+        )
     }
 
 }
