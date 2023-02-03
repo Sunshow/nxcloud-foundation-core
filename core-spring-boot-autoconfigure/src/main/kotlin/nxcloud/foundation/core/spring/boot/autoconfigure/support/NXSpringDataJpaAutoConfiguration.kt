@@ -3,6 +3,7 @@ package nxcloud.foundation.core.spring.boot.autoconfigure.support
 import nxcloud.foundation.core.data.jpa.aop.SoftDeleteAdvisor
 import nxcloud.foundation.core.data.jpa.aop.SoftDeleteFilterAdvice
 import nxcloud.foundation.core.data.jpa.event.SoftDeleteEventListener
+import nxcloud.foundation.core.data.jpa.interceptor.EmptyJpaSessionFactoryInterceptor
 import nxcloud.foundation.core.spring.support.SpringContextHelper
 import org.aopalliance.aop.Advice
 import org.hibernate.engine.spi.SessionImplementor
@@ -11,6 +12,7 @@ import org.hibernate.event.spi.EventType
 import org.hibernate.internal.SessionFactoryImpl
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.AutoConfiguration
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.domain.EntityScan
@@ -33,6 +35,20 @@ class NXSpringDataJpaAutoConfiguration {
         return HibernatePropertiesCustomizer {
             it["hibernate.identifier_generator_strategy_provider"] =
                 "nxcloud.foundation.core.data.jpa.id.DeployContextIdentifierGeneratorStrategyProvider"
+        }
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(EmptyJpaSessionFactoryInterceptor::class)
+    fun emptyJpaSessionFactoryInterceptor(): EmptyJpaSessionFactoryInterceptor {
+        return EmptyJpaSessionFactoryInterceptor()
+    }
+
+    @Bean
+    @ConditionalOnBean(EmptyJpaSessionFactoryInterceptor::class)
+    fun sessionFactoryInterceptorHibernatePropertiesCustomizer(interceptor: EmptyJpaSessionFactoryInterceptor): HibernatePropertiesCustomizer {
+        return HibernatePropertiesCustomizer {
+            it["hibernate.session_factory.interceptor"] = interceptor::class.java.canonicalName
         }
     }
 

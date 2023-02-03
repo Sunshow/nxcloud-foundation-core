@@ -56,9 +56,9 @@ class EmployeeIntegrationTest {
         entityManager.persist(employee)
         entityManager.flush()
 
-        val found = employeeRepository.findByName(employee.name)
+        var found = employeeRepository.findByName(employee.name)
         assertNotNull(found)
-        assertTrue { found.deleted == 0L }
+        assertTrue { found!!.deleted == 0L }
 
         employeeRepository.delete(found)
         employeeRepository.flush()
@@ -67,6 +67,8 @@ class EmployeeIntegrationTest {
             employeeService.findByName(employee.name) != null
         }
 
+        entityManager.detach(employee)
+        found = employeeService.findByName(employee.name)!!
         found.deleted = System.currentTimeMillis()
         employeeRepository.save(found)
         employeeRepository.flush()
