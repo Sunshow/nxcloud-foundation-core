@@ -1,5 +1,6 @@
 package nxcloud.foundation.core.data.jpa.test
 
+import nxcloud.foundation.core.data.jpa.interceptor.EmptyJpaSessionFactoryInterceptor
 import nxcloud.foundation.core.data.support.listener.DefaultPostEntityLifecycleListenerRegistrationBean
 import nxcloud.foundation.core.spring.boot.autoconfigure.support.NXSpringDataJpaAutoConfiguration
 import nxcloud.foundation.core.spring.boot.autoconfigure.support.NXSpringSupportAutoConfiguration
@@ -15,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.context.annotation.Bean
 import org.springframework.test.annotation.Rollback
+import javax.persistence.EntityManagerFactory
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -97,6 +99,14 @@ class EmployeeIntegrationTest {
             employeeService.findByName("Tom") != null
         }
     }
+
+    @Rollback(false)
+    @Test
+    fun testAudit() {
+        val employee = Employee(name = "John")
+        employeeRepository.save(employee)
+        employeeRepository.flush()
+    }
 }
 
 
@@ -119,15 +129,20 @@ class App {
     }
 
     @Bean
-    fun postUpdateEntityLifecycleListener(): PostUpdateEntityLifecycleListener {
-        return PostUpdateEntityLifecycleListener()
+    fun postUpdateEntityLifecycleListener(entityManagerFactory: EntityManagerFactory): PostUpdateEntityLifecycleListener {
+        return PostUpdateEntityLifecycleListener(entityManagerFactory)
     }
 
     @Bean
-    fun defaultPostEntityLifecycleListenerRegistrationBean(): DefaultPostEntityLifecycleListenerRegistrationBean {
+    fun defaultPostEntityLifecycleListenerRegistrationBean(listener: PostUpdateEntityLifecycleListener): DefaultPostEntityLifecycleListenerRegistrationBean {
         return DefaultPostEntityLifecycleListenerRegistrationBean(
-            listOf(postUpdateEntityLifecycleListener())
+            listOf(listener)
         )
+    }
+
+    @Bean
+    fun testJpaSessionFactoryInterceptor(): EmptyJpaSessionFactoryInterceptor {
+        return TestJpaSessionFactoryInterceptor()
     }
 
 }

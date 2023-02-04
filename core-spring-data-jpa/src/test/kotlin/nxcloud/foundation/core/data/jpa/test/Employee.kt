@@ -4,6 +4,7 @@ import nxcloud.foundation.core.data.jpa.entity.SoftDeleteJpaEntity
 import nxcloud.foundation.core.data.support.annotation.EnableSoftDelete
 import org.hibernate.annotations.DynamicInsert
 import org.hibernate.annotations.DynamicUpdate
+import org.hibernate.envers.Audited
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
@@ -12,6 +13,7 @@ import javax.persistence.Entity
 import javax.persistence.Table
 
 
+@Audited
 @DynamicInsert
 @DynamicUpdate
 @Entity

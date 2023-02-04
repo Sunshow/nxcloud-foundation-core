@@ -12,4 +12,5 @@ dependencies {
     testImplementation(libs.springboot.starter.data.jpa)
     testImplementation(libs.springboot.starter.aop)
     testImplementation(libs.h2)
+    testImplementation(libs.hibernate.envers)
 }
