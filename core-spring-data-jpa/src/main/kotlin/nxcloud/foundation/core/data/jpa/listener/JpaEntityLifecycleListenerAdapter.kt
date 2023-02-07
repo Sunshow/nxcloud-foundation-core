@@ -65,7 +65,7 @@ class JpaEntityLifecycleListenerAdapter {
             ?: emptyList()
     }
 
-    private val entityListenerRegistrationBeanMapping: Map<Class<Any>, EntityLifecycleListenerRegistrationBean> by lazy {
+    private val entityListenerRegistrationBeanMapping: Map<Class<*>, EntityLifecycleListenerRegistrationBean> by lazy {
         SpringContextHelper.getBeansOfType(EntityLifecycleListenerRegistrationBean::class.java)
             .values
             .associateBy {
@@ -74,7 +74,7 @@ class JpaEntityLifecycleListenerAdapter {
     }
 
     private fun listeners(entity: Any): List<EntityLifecycleListener> {
-        val registrationBean = entityListenerRegistrationBeanMapping[entity]
+        val registrationBean = entityListenerRegistrationBeanMapping[entity::class.java]
             ?: return defaultPreEntityLifecycleListeners + defaultPostEntityLifecycleListeners
 
         return if (registrationBean.ignorePre && registrationBean.ignorePost) {
