@@ -7,8 +7,7 @@ import org.aopalliance.intercept.MethodInvocation
 import org.hibernate.Session
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties
 import org.springframework.orm.jpa.EntityManagerFactoryUtils
-import org.springframework.orm.jpa.EntityManagerHolder
-import org.springframework.transaction.support.TransactionSynchronizationManager
+import org.springframework.orm.jpa.ExtendedEntityManagerCreator
 import javax.persistence.EntityManagerFactory
 
 
@@ -27,9 +26,10 @@ open class SoftDeleteFilterAdvice(
         )
             ?: run {
                 logger.debug { "当前线程还未绑定 EntityManager, 自动创建并绑定" }
-                val em = entityManagerFactory.createEntityManager(jpaProperties.properties)
-                TransactionSynchronizationManager.bindResource(entityManagerFactory, EntityManagerHolder(em))
-                em
+                ExtendedEntityManagerCreator.createContainerManagedEntityManager(
+                    entityManagerFactory,
+                    jpaProperties.properties
+                )
             }
         return try {
             logger.debug { "启用当前会话的软删除过滤器: ${JpaConstants.FILTER_SOFT_DELETE}" }
