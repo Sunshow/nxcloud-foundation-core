@@ -54,52 +54,52 @@ class NXSpringSupportAutoConfiguration {
         )
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnMissingBean(BeanMapperFacade::class)
     @ConditionalOnClass(MapperFactory::class)
     internal class OrikaBeanMapperFacadeImplConfiguration {
         @Bean
-        @ConditionalOnMissingBean(MapperFactory::class)
+        @ConditionalOnMissingBean
         fun defaultMapperFactory(): MapperFactory {
             return DefaultMapperFactory.Builder().build()
         }
 
         @Bean
-        @ConditionalOnMissingBean(BeanMapperFacade::class)
+        @ConditionalOnMissingBean
         fun beanMapperFacade(mapperFactory: MapperFactory): BeanMapperFacade {
             return OrikaBeanMapperFacadeImpl(mapperFactory)
         }
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnMissingBean(BeanMapperFacade::class)
     @ConditionalOnClass(Mapper::class)
     internal class DozerBeanMapperFacadeImplConfiguration {
         @Bean
-        @ConditionalOnMissingBean(Mapper::class)
+        @ConditionalOnMissingBean
         fun defaultMapper(): Mapper {
             return DozerBeanMapperBuilder.buildDefault()
         }
 
         @Bean
-        @ConditionalOnMissingBean(BeanMapperFacade::class)
+        @ConditionalOnMissingBean
         fun beanMapperFacade(mapper: Mapper): BeanMapperFacade {
             return DozerBeanMapperFacadeImpl(mapper)
         }
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnMissingBean(BeanMapperFacade::class)
     @ConditionalOnClass(ModelMapper::class)
     internal class ModelMapperMapperFacadeImplConfiguration {
         @Bean
-        @ConditionalOnMissingBean(ModelMapper::class)
+        @ConditionalOnMissingBean
         fun modelMapper(): ModelMapper {
             return ModelMapper()
         }
 
         @Bean
-        @ConditionalOnMissingBean(BeanMapperFacade::class)
+        @ConditionalOnMissingBean
         fun beanMapperFacade(modelMapper: ModelMapper): BeanMapperFacade {
             return ModelMapperBeanMapperFacadeImpl(modelMapper)
         }
