@@ -7,16 +7,16 @@ import nxcloud.foundation.core.lang.exception.NXRuntimeException
  */
 interface BeanMapperFacade {
 
-    fun <S, D> map(sourceObject: S, destinationClass: Class<D>): D
+    fun <S : Any, D : Any> map(sourceObject: S, destinationClass: Class<D>): D
 
-    fun <S, D> mapNullable(sourceObject: S?, destinationClass: Class<D>): D? {
+    fun <S : Any, D : Any> mapNullable(sourceObject: S?, destinationClass: Class<D>): D? {
         return sourceObject?.let { map(it, destinationClass) }
     }
 
-    fun <S, D> mapList(source: Collection<S>, destinationClass: Class<D>): List<D> =
+    fun <S : Any, D : Any> mapList(source: Collection<S>, destinationClass: Class<D>): List<D> =
         source.map { map(it, destinationClass) }
 
-    fun <S, D> mapList(
+    fun <S : Any, D : Any> mapList(
         source: Collection<S>,
         destinationClass: Class<D>,
         consumer: (S, D) -> Unit
@@ -32,9 +32,10 @@ interface BeanMapperFacade {
 /**
  * 为 kotlin 扩展便于调用的方法
  */
-inline fun <reified D> (BeanMapperFacade).map(sourceObject: Any): D = map(sourceObject, D::class.java)
+inline fun <reified D : Any> (BeanMapperFacade).map(sourceObject: Any): D = map(sourceObject, D::class.java)
 
-inline fun <reified D> (BeanMapperFacade).mapList(source: Collection<Any>): List<D> = mapList(source, D::class.java)
+inline fun <reified D : Any> (BeanMapperFacade).mapList(source: Collection<Any>): List<D> =
+    mapList(source, D::class.java)
 
 open class BeanMappingException(
     message: String,

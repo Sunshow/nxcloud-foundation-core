@@ -6,5 +6,6 @@ dependencies {
     compileOnly(libs.springboot.starter.data.jpa)
     compileOnly(libs.orika.core)
     compileOnly(libs.dozer.core)
+    compileOnly(libs.modelmapper)
     api(libs.springboot.autoconfigure)
 }

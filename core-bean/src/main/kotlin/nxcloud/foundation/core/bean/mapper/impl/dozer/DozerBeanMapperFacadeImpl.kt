@@ -6,7 +6,7 @@ import nxcloud.foundation.core.bean.mapper.BeanMappingException
 
 open class DozerBeanMapperFacadeImpl(private val dozer: Mapper) : BeanMapperFacade {
 
-    override fun <S, D> map(sourceObject: S, destinationClass: Class<D>): D {
+    override fun <S : Any, D : Any> map(sourceObject: S, destinationClass: Class<D>): D {
         try {
             return dozer.map(sourceObject, destinationClass)
         } catch (e: Exception) {

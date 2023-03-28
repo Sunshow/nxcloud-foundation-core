@@ -7,11 +7,13 @@ import ma.glasnost.orika.impl.DefaultMapperFactory
 import nxcloud.foundation.core.base.deploy.DeployContext
 import nxcloud.foundation.core.bean.mapper.BeanMapperFacade
 import nxcloud.foundation.core.bean.mapper.impl.dozer.DozerBeanMapperFacadeImpl
+import nxcloud.foundation.core.bean.mapper.impl.modelmapper.ModelMapperBeanMapperFacadeImpl
 import nxcloud.foundation.core.bean.mapper.impl.orika.OrikaBeanMapperFacadeImpl
 import nxcloud.foundation.core.idgenerator.IdGeneratorFacade
 import nxcloud.foundation.core.idgenerator.impl.snowflake.SnowFlakeIdGenerator
 import nxcloud.foundation.core.idgenerator.impl.snowflake.SnowFlakeIdGeneratorFacadeImpl
 import nxcloud.foundation.core.spring.support.SpringContextHelperAware
+import org.modelmapper.ModelMapper
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
@@ -83,6 +85,23 @@ class NXSpringSupportAutoConfiguration {
         @ConditionalOnMissingBean(BeanMapperFacade::class)
         fun beanMapperFacade(mapper: Mapper): BeanMapperFacade {
             return DozerBeanMapperFacadeImpl(mapper)
+        }
+    }
+
+    @Configuration
+    @ConditionalOnMissingBean(BeanMapperFacade::class)
+    @ConditionalOnClass(ModelMapper::class)
+    internal class ModelMapperMapperFacadeImplConfiguration {
+        @Bean
+        @ConditionalOnMissingBean(ModelMapper::class)
+        fun modelMapper(): ModelMapper {
+            return ModelMapper()
+        }
+
+        @Bean
+        @ConditionalOnMissingBean(BeanMapperFacade::class)
+        fun beanMapperFacade(modelMapper: ModelMapper): BeanMapperFacade {
+            return ModelMapperBeanMapperFacadeImpl(modelMapper)
         }
     }
 
