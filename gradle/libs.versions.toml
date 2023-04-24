@@ -1,9 +1,8 @@
 [versions]
-org-jetbrains-kotlin = "1.7.10"
+org-jetbrains-kotlin = "1.8.20"
 org-springframework = { prefer = "5.3.23" }
-org-springframework-boot = { prefer = "2.7.5" }
-io-freefair-lombok = "6.5.1"
-com-vanniktech-gradle-maven-publish = "0.22.0"
+org-springframework-boot = { prefer = "2.7.11" }
+io-freefair-lombok = "8.0.1"
 org-slf4j = { prefer = "1.7.36" }
 jakarta-persistence = "2.2.3"
 jakarta-validation = { prefer = "2.0.2" }
@@ -49,4 +48,3 @@ kotlin-noarg = { id = "org.jetbrains.kotlin.plugin.noarg", version.ref = "org-je
 kotlin-lombok = { id = "org.jetbrains.kotlin.plugin.lombok", version.ref = "org-jetbrains-kotlin" }
 freefair-lombok = { id = "io.freefair.lombok", version.ref = "io-freefair-lombok" }
 springboot = { id = "org.springframework.boot", version.ref = "org-springframework-boot" }
-mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "com-vanniktech-gradle-maven-publish" }

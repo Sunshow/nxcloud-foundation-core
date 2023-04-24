@@ -1,7 +1,6 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-@Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     `java-library`
     signing
@@ -91,7 +90,6 @@ subprojects {
 
     tasks.withType<Test> {
         useJUnitPlatform()
-        @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
         jvmArgs = jvmArgs!! + listOf(
             "-XX:+HeapDumpOnOutOfMemoryError"
         )
