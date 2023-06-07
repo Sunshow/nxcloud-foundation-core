@@ -62,7 +62,7 @@ class NXSpringDataJpaAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(SoftDeleteAdvisor::class)
+    @ConditionalOnMissingBean(name = ["softDeleteAdvisor"])
     fun softDeleteAdvisor(@Qualifier("softDeleteFilterAdvice") advice: Advice): SoftDeleteAdvisor {
         return SoftDeleteAdvisor(advice)
     }
