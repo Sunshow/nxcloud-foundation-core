@@ -1,5 +1,5 @@
 [versions]
-org-jetbrains-kotlin = "1.8.20"
+org-jetbrains-kotlin = "1.8.22"
 org-springframework = { prefer = "5.3.23" }
 org-springframework-boot = { prefer = "2.7.11" }
 io-freefair-lombok = "8.0.1"

@@ -2,6 +2,7 @@ package nxcloud.foundation.core.spring.boot.autoconfigure.support
 
 import nxcloud.foundation.core.data.jpa.aop.SoftDeleteAdvisor
 import nxcloud.foundation.core.data.jpa.aop.SoftDeleteFilterAdvice
+import nxcloud.foundation.core.data.jpa.context.EntityManagerInitializerHolder
 import nxcloud.foundation.core.data.jpa.event.SoftDeleteEventListener
 import nxcloud.foundation.core.data.jpa.interceptor.EmptyJpaSessionFactoryInterceptor
 import nxcloud.foundation.core.spring.support.SpringContextHelper
@@ -18,7 +19,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties
+import org.springframework.boot.autoconfigure.transaction.PlatformTransactionManagerCustomizer
 import org.springframework.context.annotation.Bean
+import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.stereotype.Component
 import javax.annotation.PostConstruct
 import javax.persistence.EntityManagerFactory
@@ -49,6 +52,18 @@ class NXSpringDataJpaAutoConfiguration {
     fun sessionFactoryInterceptorHibernatePropertiesCustomizer(interceptor: EmptyJpaSessionFactoryInterceptor): HibernatePropertiesCustomizer {
         return HibernatePropertiesCustomizer {
             it["hibernate.session_factory.interceptor"] = interceptor::class.java.canonicalName
+        }
+    }
+
+    @Bean
+    fun jpaTransactionManagerCustomizer(): PlatformTransactionManagerCustomizer<JpaTransactionManager> {
+        return PlatformTransactionManagerCustomizer<JpaTransactionManager> {
+            it.setEntityManagerInitializer {
+                EntityManagerInitializerHolder.get()
+                    .forEach { initializer ->
+                        initializer(it)
+                    }
+            }
         }
     }
 

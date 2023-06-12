@@ -15,11 +15,15 @@ plugins {
 
 allprojects {
     group = "net.sunshow.nxcloud"
-    version = "0.3.0-SNAPSHOT"
+    version = "0.3.2-SNAPSHOT"
 
     repositories {
         mavenCentral()
         google()
+    }
+
+    configurations.all {
+        resolutionStrategy.cacheChangingModulesFor(0, "seconds")
     }
 
     tasks.create("downloadDependencies") {
