@@ -11,6 +11,7 @@ include(":core-spring-support")
 include(":core-spring-boot-autoconfigure")
 include(":core-spring-boot-starter")
 include(":core-spring-boot-starter-data-jpa")
+include(":core-event")
 
 pluginManagement {
     repositories {
