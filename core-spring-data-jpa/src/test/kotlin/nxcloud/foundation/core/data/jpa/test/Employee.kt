@@ -1,5 +1,7 @@
 package nxcloud.foundation.core.data.jpa.test
 
+import jakarta.persistence.Entity
+import jakarta.persistence.Table
 import nxcloud.foundation.core.data.jpa.entity.SoftDeleteJpaEntity
 import nxcloud.foundation.core.data.support.annotation.EnableSoftDelete
 import org.hibernate.annotations.DynamicInsert
@@ -9,8 +11,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import javax.persistence.Entity
-import javax.persistence.Table
 
 
 @Audited

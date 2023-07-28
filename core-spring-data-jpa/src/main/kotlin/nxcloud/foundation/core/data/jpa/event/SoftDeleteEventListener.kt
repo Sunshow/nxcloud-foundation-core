@@ -1,6 +1,6 @@
 package nxcloud.foundation.core.data.jpa.event
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import nxcloud.foundation.core.data.jpa.entity.DeletedField
 import org.hibernate.event.spi.PreDeleteEvent
 import org.hibernate.event.spi.PreDeleteEventListener

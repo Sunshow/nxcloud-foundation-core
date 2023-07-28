@@ -1,5 +1,6 @@
 package nxcloud.foundation.core.data.jpa.test
 
+import jakarta.persistence.EntityManagerFactory
 import nxcloud.foundation.core.data.jpa.interceptor.EmptyJpaSessionFactoryInterceptor
 import nxcloud.foundation.core.data.support.listener.DefaultPostEntityLifecycleListenerRegistrationBean
 import nxcloud.foundation.core.spring.boot.autoconfigure.support.NXSpringDataJpaAutoConfiguration
@@ -16,7 +17,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.context.annotation.Bean
 import org.springframework.test.annotation.Rollback
-import javax.persistence.EntityManagerFactory
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 

@@ -1,11 +1,11 @@
 package nxcloud.foundation.core.data.jpa.entity
 
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.Id
+import jakarta.persistence.MappedSuperclass
 import nxcloud.foundation.core.data.jpa.constant.JpaConstants
 import org.hibernate.annotations.GenericGenerator
 import java.time.LocalDateTime
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
-import javax.persistence.MappedSuperclass
 
 @MappedSuperclass
 abstract class DefaultJpaEntity : JpaEntity(), LongIdPK, CreatedTimeField, UpdatedTimeField {

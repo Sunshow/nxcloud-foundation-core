@@ -1,5 +1,7 @@
 package nxcloud.foundation.core.spring.boot.autoconfigure.support
 
+import jakarta.annotation.PostConstruct
+import jakarta.persistence.EntityManagerFactory
 import nxcloud.foundation.core.data.jpa.context.EntityManagerInitializerHolder
 import nxcloud.foundation.core.data.jpa.event.SoftDeleteEventListener
 import nxcloud.foundation.core.data.jpa.interceptor.EmptyJpaSessionFactoryInterceptor
@@ -18,8 +20,6 @@ import org.springframework.boot.autoconfigure.transaction.PlatformTransactionMan
 import org.springframework.context.annotation.Bean
 import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.stereotype.Component
-import javax.annotation.PostConstruct
-import javax.persistence.EntityManagerFactory
 
 
 @AutoConfiguration(after = [NXSpringSupportAutoConfiguration::class, SpringContextHelper::class])

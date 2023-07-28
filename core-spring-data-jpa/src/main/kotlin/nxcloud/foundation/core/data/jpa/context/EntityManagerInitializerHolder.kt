@@ -1,6 +1,6 @@
 package nxcloud.foundation.core.data.jpa.context
 
-import javax.persistence.EntityManager
+import jakarta.persistence.EntityManager
 
 object EntityManagerInitializerHolder {
 

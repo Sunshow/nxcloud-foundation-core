@@ -15,7 +15,7 @@ plugins {
 
 allprojects {
     group = "net.sunshow.nxcloud"
-    version = "0.3.2-SNAPSHOT"
+    version = "0.5.0-SNAPSHOT"
 
     repositories {
         mavenCentral()
@@ -59,16 +59,16 @@ subprojects {
 
     allOpen {
         annotations(
-            "javax.persistence.Entity",
-            "javax.persistence.MappedSuperclass",
-            "javax.persistence.Embedabble",
+            "jakarta.persistence.Entity",
+            "jakarta.persistence.MappedSuperclass",
+            "jakarta.persistence.Embedabble",
             "org.springframework.context.annotation.Configuration",
             "org.springframework.transaction.annotation.Transactional",
         )
     }
 
     noArg {
-        annotation("javax.persistence.Entity")
+        annotation("jakarta.persistence.Entity")
     }
 
     tasks.withType<JavaCompile> {
@@ -77,20 +77,20 @@ subprojects {
 
     configure<JavaPluginExtension> {
         toolchain {
-            languageVersion.set(JavaLanguageVersion.of(11))
+            languageVersion.set(JavaLanguageVersion.of(17))
         }
     }
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {
-            jvmTarget = JavaVersion.VERSION_1_8.toString()
+            jvmTarget = JavaVersion.VERSION_17.toString()
             freeCompilerArgs = listOf(
                 "-Xjvm-default=all",
             )
         }
     }
 
-    val testJavaVersion = System.getProperty("test.java.version", "11").toInt()
+    val testJavaVersion = System.getProperty("test.java.version", "17").toInt()
 
     tasks.withType<Test> {
         useJUnitPlatform()
@@ -112,13 +112,13 @@ subprojects {
     }
 
     tasks.withType<JavaCompile> {
-        sourceCompatibility = JavaVersion.VERSION_1_8.toString()
-        targetCompatibility = JavaVersion.VERSION_1_8.toString()
+        sourceCompatibility = JavaVersion.VERSION_17.toString()
+        targetCompatibility = JavaVersion.VERSION_17.toString()
     }
 
     dependencies {
-        // implementation(platform(rootProject.libs.bom.springboot))
-        // implementation(rootProject.libs.slf4j.api)
+        implementation(platform(rootProject.libs.bom.springboot))
+        implementation("org.slf4j:slf4j-api")
         implementation(rootProject.libs.kotlin.logging.jvm)
         testImplementation("org.jetbrains.kotlin:kotlin-test")
         testImplementation("org.junit.jupiter:junit-jupiter-api")
@@ -135,7 +135,7 @@ subprojects {
     publishing {
 
         // 发布 release
-        // version = "0.3.9"
+        version = "0.5.0"
 
         val sourcesJar by tasks.registering(Jar::class) {
             archiveClassifier.set("sources")

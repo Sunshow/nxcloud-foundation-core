@@ -1,5 +1,5 @@
 package nxcloud.foundation.core.data.jpa.interceptor
 
-import org.hibernate.EmptyInterceptor
+import org.hibernate.Interceptor
 
-open class EmptyJpaSessionFactoryInterceptor : EmptyInterceptor()
+open class EmptyJpaSessionFactoryInterceptor : Interceptor

@@ -1,11 +1,11 @@
 package nxcloud.foundation.core.data.jpa.test
 
+import jakarta.persistence.EntityManagerFactory
 import nxcloud.foundation.core.data.support.listener.EntityLifecycleListener
 import org.hibernate.envers.AuditReaderFactory
 import org.springframework.orm.jpa.EntityManagerHolder
 import org.springframework.transaction.support.TransactionSynchronization
 import org.springframework.transaction.support.TransactionSynchronizationManager
-import javax.persistence.EntityManagerFactory
 
 
 class PostUpdateEntityLifecycleListener(

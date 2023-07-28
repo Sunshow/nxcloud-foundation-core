@@ -1,6 +1,6 @@
 package nxcloud.foundation.core.data.jpa.id
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import nxcloud.foundation.core.idgenerator.IdGeneratorFacade
 import nxcloud.foundation.core.spring.support.SpringContextHelper
 import org.hibernate.engine.spi.SharedSessionContractImplementor
@@ -44,7 +44,7 @@ class DeployContextIdentifierGenerator : IdentifierGenerator {
 
         // logger out generated id
         logger.debug { "generate id is $next" }
-        
+
         return next
     }
 

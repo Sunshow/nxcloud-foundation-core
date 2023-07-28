@@ -5,12 +5,12 @@ dependencies {
     api(project(":core-spring-support"))
     api(project(":core-idgenerator"))
     // compileOnly(libs.jakarta.persistence.api)
-    compileOnly(libs.springboot.starter.data.jpa)
+    compileOnly("org.springframework.boot:spring-boot-starter-data-jpa")
 
     testImplementation(project(":core-spring-boot-starter"))
-    testImplementation(libs.springboot.starter.test)
-    testImplementation(libs.springboot.starter.data.jpa)
-    testImplementation(libs.springboot.starter.aop)
-    testImplementation(libs.h2)
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    testImplementation("org.springframework.boot:spring-boot-starter-aop")
+    testImplementation("com.h2database:h2")
     testImplementation(libs.hibernate.envers)
 }

@@ -1,6 +1,7 @@
 package nxcloud.foundation.core.data.jpa.aop
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
+import jakarta.persistence.EntityManagerFactory
 import nxcloud.foundation.core.data.jpa.constant.JpaConstants
 import org.aopalliance.intercept.MethodInterceptor
 import org.aopalliance.intercept.MethodInvocation
@@ -8,7 +9,6 @@ import org.hibernate.Session
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties
 import org.springframework.orm.jpa.EntityManagerFactoryUtils
 import org.springframework.orm.jpa.ExtendedEntityManagerCreator
-import javax.persistence.EntityManagerFactory
 
 
 open class SoftDeleteFilterAdvice(

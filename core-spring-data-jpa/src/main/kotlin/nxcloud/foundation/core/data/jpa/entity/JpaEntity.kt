@@ -1,8 +1,8 @@
 package nxcloud.foundation.core.data.jpa.entity
 
+import jakarta.persistence.EntityListeners
+import jakarta.persistence.MappedSuperclass
 import nxcloud.foundation.core.data.jpa.listener.JpaEntityLifecycleListenerAdapter
-import javax.persistence.EntityListeners
-import javax.persistence.MappedSuperclass
 
 @MappedSuperclass
 @EntityListeners(JpaEntityLifecycleListenerAdapter::class)

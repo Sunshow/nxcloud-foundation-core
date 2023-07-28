@@ -1,6 +1,6 @@
 package nxcloud.foundation.core.data.jpa.test
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import nxcloud.foundation.core.data.jpa.interceptor.EmptyJpaSessionFactoryInterceptor
 import org.hibernate.Transaction
 

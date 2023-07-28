@@ -1,6 +1,6 @@
 package nxcloud.foundation.core.data.jpa.entity
 
-import javax.persistence.MappedSuperclass
+import jakarta.persistence.MappedSuperclass
 
 @MappedSuperclass
 //@FilterDef(

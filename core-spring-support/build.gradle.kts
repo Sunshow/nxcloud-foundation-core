@@ -1,6 +1,7 @@
 dependencies {
     api(project(":core-base"))
     api(project(":core-idgenerator"))
-    compileOnly(libs.spring.context)
-    testImplementation(libs.spring.context)
+    compileOnly("org.springframework:spring-context")
+    
+    testImplementation("org.springframework:spring-context")
 }

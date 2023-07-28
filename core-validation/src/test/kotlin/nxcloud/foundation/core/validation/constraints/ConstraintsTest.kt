@@ -1,8 +1,8 @@
 package nxcloud.foundation.core.validation.constraints
 
+import jakarta.validation.Validation
+import jakarta.validation.constraints.NotBlank
 import org.junit.jupiter.api.Test
-import javax.validation.Validation
-import javax.validation.constraints.NotBlank
 import kotlin.test.assertEquals
 
 class ConstraintsTest {

@@ -1,8 +1,8 @@
 package nxcloud.foundation.core.data.jpa.converter
 
+import jakarta.persistence.AttributeConverter
 import nxcloud.foundation.core.lang.enumeration.IntSealedEnum
 import nxcloud.foundation.core.lang.exception.SealedEnumUnrecognizedException
-import javax.persistence.AttributeConverter
 import kotlin.reflect.KClass
 
 abstract class NullableIntSealedEnumAttributeConverter<T : IntSealedEnum> : AttributeConverter<T, Int> {

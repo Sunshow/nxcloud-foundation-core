@@ -1,12 +1,12 @@
 package nxcloud.foundation.core.data.jpa.listener
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
+import jakarta.persistence.*
 import nxcloud.foundation.core.data.support.listener.DefaultPostEntityLifecycleListenerRegistrationBean
 import nxcloud.foundation.core.data.support.listener.DefaultPreEntityLifecycleListenerRegistrationBean
 import nxcloud.foundation.core.data.support.listener.EntityLifecycleListener
 import nxcloud.foundation.core.data.support.listener.EntityLifecycleListenerRegistrationBean
 import nxcloud.foundation.core.spring.support.SpringContextHelper
-import javax.persistence.*
 
 class JpaEntityLifecycleListenerAdapter {
 
