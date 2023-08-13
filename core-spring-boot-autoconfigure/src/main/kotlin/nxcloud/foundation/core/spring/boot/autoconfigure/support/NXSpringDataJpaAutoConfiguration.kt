@@ -27,14 +27,14 @@ import org.springframework.stereotype.Component
 @EntityScan(basePackages = ["nxcloud.foundation.core.data.jpa.converter.base"])
 class NXSpringDataJpaAutoConfiguration {
 
-    @Bean
-    @ConditionalOnMissingBean(name = ["identifierGeneratorStrategyHibernatePropertiesCustomizer"])
-    fun identifierGeneratorStrategyHibernatePropertiesCustomizer(): HibernatePropertiesCustomizer {
-        return HibernatePropertiesCustomizer {
-            it["hibernate.identifier_generator_strategy_provider"] =
-                "nxcloud.foundation.core.data.jpa.id.DeployContextIdentifierGeneratorStrategyProvider"
-        }
-    }
+//    @Bean
+//    @ConditionalOnMissingBean(name = ["identifierGeneratorStrategyHibernatePropertiesCustomizer"])
+//    fun identifierGeneratorStrategyHibernatePropertiesCustomizer(): HibernatePropertiesCustomizer {
+//        return HibernatePropertiesCustomizer {
+//            it["hibernate.identifier_generator_strategy_provider"] =
+//                "nxcloud.foundation.core.data.jpa.id.DeployContextIdentifierGeneratorStrategyProvider"
+//        }
+//    }
 
     @Bean
     @ConditionalOnMissingBean(EmptyJpaSessionFactoryInterceptor::class)
