@@ -44,7 +44,7 @@ class DeployContextIdentifierGenerator : IdentifierGenerator {
 //        return generator.generate(session, obj)
 
         val assignedId = session.getEntityPersister(entityName, obj).getIdentifier(obj, session)
-        if (assignedId != null) {
+        if (assignedId != null && assignedId.toString().toLong() > 0) {
             logger.debug { "already assigned id: $assignedId, won't generate" }
             return assignedId as Serializable
         }
