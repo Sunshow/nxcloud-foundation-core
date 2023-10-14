@@ -12,17 +12,20 @@ import nxcloud.foundation.core.bean.mapper.impl.orika.OrikaBeanMapperFacadeImpl
 import nxcloud.foundation.core.idgenerator.IdGeneratorFacade
 import nxcloud.foundation.core.idgenerator.impl.snowflake.SnowFlakeIdGenerator
 import nxcloud.foundation.core.idgenerator.impl.snowflake.SnowFlakeIdGeneratorFacadeImpl
+import nxcloud.foundation.core.spring.boot.autoconfigure.properties.WechatProperties
 import nxcloud.foundation.core.spring.support.context.SpringContextHelperAware
 import org.modelmapper.ModelMapper
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @AutoConfiguration
 @ConditionalOnClass(SpringContextHelperAware::class)
+@EnableConfigurationProperties(WechatProperties::class)
 class NXSpringSupportAutoConfiguration {
 
     @Value("\${nxcloud.deploy.context.center-id:0}")

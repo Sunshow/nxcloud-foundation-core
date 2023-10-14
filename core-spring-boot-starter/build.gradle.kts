@@ -3,5 +3,7 @@ dependencies {
     api(project(":core-spring-support"))
     api(project(":core-bean"))
 
-    testImplementation(libs.orika.core)
+    testImplementation(libs.modelmapper)
+    // add logback
+    testImplementation("ch.qos.logback:logback-classic")
 }
