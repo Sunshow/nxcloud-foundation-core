@@ -5,7 +5,7 @@ import jakarta.persistence.EntityManagerFactory
 import nxcloud.foundation.core.data.jpa.context.EntityManagerInitializerHolder
 import nxcloud.foundation.core.data.jpa.event.SoftDeleteEventListener
 import nxcloud.foundation.core.data.jpa.interceptor.EmptyJpaSessionFactoryInterceptor
-import nxcloud.foundation.core.spring.support.SpringContextHelper
+import nxcloud.foundation.core.spring.support.context.SpringContextHelper
 import org.hibernate.engine.spi.SessionImplementor
 import org.hibernate.event.service.spi.EventListenerRegistry
 import org.hibernate.event.spi.EventType
@@ -22,7 +22,7 @@ import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.stereotype.Component
 
 
-@AutoConfiguration(after = [NXSpringSupportAutoConfiguration::class, SpringContextHelper::class])
+@AutoConfiguration(after = [NXSpringSupportAutoConfiguration::class])
 @ConditionalOnClass(SpringContextHelper::class, SessionImplementor::class)
 @EntityScan(basePackages = ["nxcloud.foundation.core.data.jpa.converter.base"])
 class NXSpringDataJpaAutoConfiguration {

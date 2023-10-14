@@ -1,5 +1,7 @@
 package nxcloud.foundation.core.spring.support;
 
+import nxcloud.foundation.core.spring.support.context.SpringContextHelper;
+import nxcloud.foundation.core.spring.support.context.SpringContextHelperAware;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

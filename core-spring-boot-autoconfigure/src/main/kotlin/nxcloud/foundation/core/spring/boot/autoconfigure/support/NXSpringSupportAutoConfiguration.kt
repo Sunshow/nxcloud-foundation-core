@@ -12,7 +12,7 @@ import nxcloud.foundation.core.bean.mapper.impl.orika.OrikaBeanMapperFacadeImpl
 import nxcloud.foundation.core.idgenerator.IdGeneratorFacade
 import nxcloud.foundation.core.idgenerator.impl.snowflake.SnowFlakeIdGenerator
 import nxcloud.foundation.core.idgenerator.impl.snowflake.SnowFlakeIdGeneratorFacadeImpl
-import nxcloud.foundation.core.spring.support.SpringContextHelperAware
+import nxcloud.foundation.core.spring.support.context.SpringContextHelperAware
 import org.modelmapper.ModelMapper
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.AutoConfiguration

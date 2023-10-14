@@ -6,7 +6,7 @@ import nxcloud.foundation.core.data.support.listener.DefaultPostEntityLifecycleL
 import nxcloud.foundation.core.data.support.listener.DefaultPreEntityLifecycleListenerRegistrationBean
 import nxcloud.foundation.core.data.support.listener.EntityLifecycleListener
 import nxcloud.foundation.core.data.support.listener.EntityLifecycleListenerRegistrationBean
-import nxcloud.foundation.core.spring.support.SpringContextHelper
+import nxcloud.foundation.core.spring.support.context.SpringContextHelper
 
 class JpaEntityLifecycleListenerAdapter {
 

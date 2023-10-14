@@ -1,4 +1,4 @@
-package nxcloud.foundation.core.spring.support
+package nxcloud.foundation.core.spring.support.context
 
 import org.springframework.beans.factory.NoSuchBeanDefinitionException
 import org.springframework.context.ApplicationContext

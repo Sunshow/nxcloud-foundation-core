@@ -2,7 +2,7 @@ package nxcloud.foundation.core.data.jpa.id
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import nxcloud.foundation.core.idgenerator.IdGeneratorFacade
-import nxcloud.foundation.core.spring.support.SpringContextHelper
+import nxcloud.foundation.core.spring.support.context.SpringContextHelper
 import org.hibernate.MappingException
 import org.hibernate.engine.spi.SharedSessionContractImplementor
 import org.hibernate.id.IdentifierGenerator
