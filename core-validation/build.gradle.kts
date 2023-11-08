@@ -1,7 +1,7 @@
 dependencies {
     api(project(":core-base"))
-    compileOnly(libs.jakarta.validation.api)
+    compileOnly("jakarta.validation:jakarta.validation-api")
 
-    testImplementation(libs.hibernate.validator)
+    testImplementation("org.hibernate.validator:hibernate-validator")
     testImplementation(libs.jakarta.el)
 }

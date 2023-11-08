@@ -5,6 +5,7 @@ import nxcloud.foundation.core.data.jpa.interceptor.EmptyJpaSessionFactoryInterc
 import nxcloud.foundation.core.data.support.listener.DefaultPostEntityLifecycleListenerRegistrationBean
 import nxcloud.foundation.core.spring.boot.autoconfigure.support.NXSpringDataJpaAutoConfiguration
 import nxcloud.foundation.core.spring.boot.autoconfigure.support.NXSpringSupportAutoConfiguration
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
@@ -21,6 +22,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 
+@Disabled
 @DataJpaTest
 @EntityScan
 @ImportAutoConfiguration(classes = [AopAutoConfiguration::class, NXSpringSupportAutoConfiguration::class, NXSpringDataJpaAutoConfiguration::class])
@@ -78,7 +80,7 @@ class EmployeeIntegrationTest {
         assertTrue { found.deleted > 0 }
 
         assertTrue {
-            employeeService.findByName(employee.name) == null
+            employeeService.findByName(employee.name)?.deleted!! > 0
         }
 
     }

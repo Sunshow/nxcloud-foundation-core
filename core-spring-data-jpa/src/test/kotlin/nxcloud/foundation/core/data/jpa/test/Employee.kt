@@ -8,7 +8,6 @@ import org.hibernate.annotations.DynamicInsert
 import org.hibernate.annotations.DynamicUpdate
 import org.hibernate.envers.Audited
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -22,7 +21,6 @@ class Employee(
     var name: String,
 ) : SoftDeleteJpaEntity()
 
-@Repository
 interface EmployeeRepository : JpaRepository<Employee, Long> {
     fun findByName(name: String): Employee?
 }

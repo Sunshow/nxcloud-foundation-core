@@ -61,7 +61,7 @@ subprojects {
         annotations(
             "jakarta.persistence.Entity",
             "jakarta.persistence.MappedSuperclass",
-            "jakarta.persistence.Embedabble",
+            "jakarta.persistence.Embeddable",
             "org.springframework.context.annotation.Configuration",
             "org.springframework.transaction.annotation.Transactional",
         )
@@ -69,6 +69,7 @@ subprojects {
 
     noArg {
         annotation("jakarta.persistence.Entity")
+        annotation("nxcloud.foundation.core.lang.annotation.NoArgs")
     }
 
     tasks.withType<JavaCompile> {
@@ -135,7 +136,7 @@ subprojects {
     publishing {
 
         // 发布 release
-        version = "0.5.3"
+        version = "0.5.4"
 
         val sourcesJar by tasks.registering(Jar::class) {
             archiveClassifier.set("sources")

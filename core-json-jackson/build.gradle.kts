@@ -1,6 +1,6 @@
 dependencies {
     api(project(":core-json"))
-    compileOnly(libs.jackson.databind)
+    compileOnly("com.fasterxml.jackson.core:jackson-databind")
 
-    testImplementation(libs.jackson.databind)
+    testImplementation("com.fasterxml.jackson.core:jackson-databind")
 }
