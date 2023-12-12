@@ -1,10 +1,10 @@
 [versions]
 org-jetbrains-kotlin = "1.9.20"
-org-springframework-boot = { prefer = "3.1.5" }
+org-springframework-boot = { prefer = "3.2.0" }
 io-freefair-lombok = "8.4"
 jakarta-persistence = "3.1.0"
-kotlin-logging-jvm = "5.1.0"
-org-modelmapper = { prefer = "3.1.1" }
+kotlin-logging-jvm = "5.1.1"
+org-modelmapper = { prefer = "3.2.0" }
 org-glassfish-jakarta-el = "5.0.0-M1"
 org-hibernate = { prefer = "6.3.1.Final" }
 

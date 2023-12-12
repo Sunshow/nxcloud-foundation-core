@@ -16,7 +16,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer
-import org.springframework.boot.autoconfigure.transaction.PlatformTransactionManagerCustomizer
+import org.springframework.boot.autoconfigure.transaction.TransactionManagerCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.stereotype.Component
@@ -51,8 +51,8 @@ class NXSpringDataJpaAutoConfiguration {
     }
 
     @Bean
-    fun jpaTransactionManagerCustomizer(): PlatformTransactionManagerCustomizer<JpaTransactionManager> {
-        return PlatformTransactionManagerCustomizer<JpaTransactionManager> {
+    fun jpaTransactionManagerCustomizer(): TransactionManagerCustomizer<JpaTransactionManager> {
+        return TransactionManagerCustomizer<JpaTransactionManager> {
             it.setEntityManagerInitializer {
                 EntityManagerInitializerHolder.get()
                     .forEach { initializer ->
@@ -92,11 +92,14 @@ class NXSpringDataJpaAutoConfiguration {
         @PostConstruct
         fun register() {
             val sessionFactory = entityManagerFactory.unwrap(SessionFactoryImpl::class.java)
-            val registry = sessionFactory.serviceRegistry.getService(
-                EventListenerRegistry::class.java
-            )
-
-            registry.getEventListenerGroup(EventType.PRE_DELETE).appendListener(softDeleteEventListener)
+            sessionFactory.serviceRegistry
+                .getService(
+                    EventListenerRegistry::class.java
+                )
+                ?.apply {
+                    getEventListenerGroup(EventType.PRE_DELETE)
+                        .appendListener(softDeleteEventListener)
+                }
         }
 
     }
