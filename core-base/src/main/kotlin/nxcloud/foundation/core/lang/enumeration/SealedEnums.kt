@@ -1,5 +1,7 @@
 package nxcloud.foundation.core.lang.enumeration
 
+import java.io.InvalidObjectException
+import java.io.ObjectStreamException
 import java.io.Serializable
 
 sealed class SealedEnum : Serializable
@@ -39,12 +41,19 @@ abstract class IntSealedEnum(
                 }
         }
     }
+
+    @Throws(ObjectStreamException::class)
+    protected fun readResolve(): Any {
+        // Use reflection to find the instance of the current class
+        val clazz = this::class
+        return clazz.objectInstance ?: throw InvalidObjectException("Cannot resolve object instance for $clazz")
+    }
 }
 
 sealed class YesNoStatus(
     value: Int,
     name: String,
 ) : IntSealedEnum(value, name) {
-    object Yes : YesNoStatus(1, "是")
-    object No : YesNoStatus(0, "否")
+    data object Yes : YesNoStatus(1, "是")
+    data object No : YesNoStatus(0, "否")
 }
