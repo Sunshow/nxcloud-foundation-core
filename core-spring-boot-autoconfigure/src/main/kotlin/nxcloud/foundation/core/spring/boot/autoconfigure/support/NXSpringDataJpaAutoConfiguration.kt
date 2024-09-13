@@ -2,20 +2,26 @@ package nxcloud.foundation.core.spring.boot.autoconfigure.support
 
 import jakarta.annotation.PostConstruct
 import jakarta.persistence.EntityManagerFactory
+import nxcloud.foundation.core.data.jpa.aop.JpaSoftDeleteAdvisor
+import nxcloud.foundation.core.data.jpa.aop.JpaSoftDeleteFilterAdvice
 import nxcloud.foundation.core.data.jpa.context.EntityManagerInitializerHolder
 import nxcloud.foundation.core.data.jpa.event.SoftDeleteEventListener
 import nxcloud.foundation.core.data.jpa.interceptor.EmptyJpaSessionFactoryInterceptor
 import nxcloud.foundation.core.spring.support.context.SpringContextHelper
+import org.aopalliance.aop.Advice
 import org.hibernate.engine.spi.SessionImplementor
 import org.hibernate.event.service.spi.EventListenerRegistry
 import org.hibernate.event.spi.EventType
 import org.hibernate.internal.SessionFactoryImpl
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer
+import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties
 import org.springframework.boot.autoconfigure.transaction.TransactionManagerCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.orm.jpa.JpaTransactionManager
@@ -62,20 +68,22 @@ class NXSpringDataJpaAutoConfiguration {
         }
     }
 
-//    @Bean
-//    @ConditionalOnMissingBean(name = ["softDeleteFilterAdvice"])
-//    fun softDeleteFilterAdvice(
-//        entityManagerFactory: EntityManagerFactory,
-//        jpaProperties: JpaProperties,
-//    ): SoftDeleteFilterAdvice {
-//        return SoftDeleteFilterAdvice(entityManagerFactory, jpaProperties)
-//    }
-//
-//    @Bean
-//    @ConditionalOnMissingBean(name = ["softDeleteAdvisor"])
-//    fun softDeleteAdvisor(@Qualifier("softDeleteFilterAdvice") advice: Advice): SoftDeleteAdvisor {
-//        return SoftDeleteAdvisor(advice)
-//    }
+    @Bean
+    @ConditionalOnProperty(name = ["nxcloud.jpa.soft-delete.enable"], havingValue = "true", matchIfMissing = true)
+    @ConditionalOnMissingBean(name = ["jpaSoftDeleteFilterAdvice"])
+    fun jpaSoftDeleteFilterAdvice(
+        entityManagerFactory: EntityManagerFactory,
+        jpaProperties: JpaProperties,
+    ): JpaSoftDeleteFilterAdvice {
+        return JpaSoftDeleteFilterAdvice(entityManagerFactory, jpaProperties)
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = ["nxcloud.jpa.soft-delete.enable"], havingValue = "true", matchIfMissing = true)
+    @ConditionalOnMissingBean(name = ["jpaSoftDeleteAdvisor"])
+    fun jpaSoftDeleteAdvisor(@Qualifier("jpaSoftDeleteFilterAdvice") advice: Advice): JpaSoftDeleteAdvisor {
+        return JpaSoftDeleteAdvisor(advice)
+    }
 
     @Bean
     @ConditionalOnMissingBean(SoftDeleteEventListener::class)

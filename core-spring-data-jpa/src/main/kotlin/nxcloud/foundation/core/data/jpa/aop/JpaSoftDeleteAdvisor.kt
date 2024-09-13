@@ -7,7 +7,7 @@ import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor
 import org.springframework.core.annotation.AnnotationUtils
 import java.lang.reflect.Method
 
-open class SoftDeleteAdvisor(advice: Advice) : StaticMethodMatcherPointcutAdvisor(advice) {
+open class JpaSoftDeleteAdvisor(advice: Advice) : StaticMethodMatcherPointcutAdvisor(advice) {
 
     override fun matches(method: Method, targetClass: Class<*>): Boolean {
         return true
@@ -18,5 +18,5 @@ open class SoftDeleteAdvisor(advice: Advice) : StaticMethodMatcherPointcutAdviso
             AnnotationUtils.findAnnotation(it, EnableSoftDelete::class.java) != null
         }
     }
-    
+
 }
