@@ -15,7 +15,7 @@ plugins {
 
 allprojects {
     group = "net.sunshow.nxcloud"
-    version = "0.5.0-SNAPSHOT"
+    version = "0.6.0-SNAPSHOT"
 
     repositories {
         mavenCentral()
@@ -136,7 +136,7 @@ subprojects {
     publishing {
 
         // 发布 release
-        version = "0.5.8"
+        version = "0.6.0"
 
         val sourcesJar by tasks.registering(Jar::class) {
             archiveClassifier.set("sources")

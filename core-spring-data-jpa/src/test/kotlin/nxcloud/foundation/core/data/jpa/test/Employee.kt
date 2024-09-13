@@ -28,7 +28,11 @@ interface EmployeeRepository : JpaRepository<Employee, Long> {
 interface EmployeeService {
     fun findByName(name: String): Employee?
 
-    fun updateByName(from: String, to: String)
+    fun updateByName(from: String, to: String): Employee?
+
+    fun saveByName(name: String): Employee
+
+    fun deleteByName(name: String): Employee?
 }
 
 abstract class EmployeeServiceImpl(protected val employeeRepository: EmployeeRepository) : EmployeeService {
@@ -40,17 +44,30 @@ abstract class EmployeeServiceImpl(protected val employeeRepository: EmployeeRep
 }
 
 // 测试注解加在子类
+@Transactional(readOnly = true)
 @EnableSoftDelete
 @Service
 class ChildEmployeeServiceImpl(employeeRepository: EmployeeRepository) :
     EmployeeServiceImpl(employeeRepository) {
 
     @Transactional
-    override fun updateByName(from: String, to: String) {
-        employeeRepository.findByName(from)
+    override fun updateByName(from: String, to: String): Employee? {
+        return employeeRepository.findByName(from)
             ?.apply {
                 name = to
             }
     }
 
+    @Transactional
+    override fun saveByName(name: String): Employee {
+        return employeeRepository.save(Employee(name))
+    }
+
+    @Transactional
+    override fun deleteByName(name: String): Employee? {
+        return employeeRepository.findByName(name)
+            ?.apply {
+                deleted = System.currentTimeMillis()
+            }
+    }
 }

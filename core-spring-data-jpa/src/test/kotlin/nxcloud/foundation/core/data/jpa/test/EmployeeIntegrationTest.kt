@@ -2,10 +2,12 @@ package nxcloud.foundation.core.data.jpa.test
 
 import jakarta.persistence.EntityManagerFactory
 import nxcloud.foundation.core.data.jpa.interceptor.EmptyJpaSessionFactoryInterceptor
+import nxcloud.foundation.core.data.support.context.DataQueryContext
+import nxcloud.foundation.core.data.support.context.DataQueryContextHolder
+import nxcloud.foundation.core.data.support.enumeration.DataQueryMode
 import nxcloud.foundation.core.data.support.listener.DefaultPostEntityLifecycleListenerRegistrationBean
 import nxcloud.foundation.core.spring.boot.autoconfigure.support.NXSpringDataJpaAutoConfiguration
 import nxcloud.foundation.core.spring.boot.autoconfigure.support.NXSpringSupportAutoConfiguration
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
@@ -19,10 +21,11 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.context.annotation.Bean
 import org.springframework.test.annotation.Rollback
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 
-@Disabled
+//@Disabled
 @DataJpaTest
 @EntityScan
 @ImportAutoConfiguration(classes = [AopAutoConfiguration::class, NXSpringSupportAutoConfiguration::class, NXSpringDataJpaAutoConfiguration::class])
@@ -56,31 +59,32 @@ class EmployeeIntegrationTest {
 
     @Test
     fun testSoftDelete() {
-        val employee = Employee(name = "John")
-        entityManager.persist(employee)
-        entityManager.flush()
+        val employee = employeeService.saveByName("John")
 
-        var found = employeeRepository.findByName(employee.name)
+        val found = employeeService.findByName(employee.name)
         assertNotNull(found)
-        assertTrue { found!!.deleted == 0L }
+        assertTrue { found.deleted == 0L }
 
-        employeeRepository.delete(found)
-        employeeRepository.flush()
+        // 软删除
+        employeeService.deleteByName(employee.name)
+
+        assertNull(employeeService.findByName(employee.name))
+
+        // 找回已删除的
+        DataQueryContextHolder.set(
+            DataQueryContext(
+                queryMode = DataQueryMode.Deleted,
+                deletedAfter = 0,
+                deletedBefore = 0,
+            )
+        )
+
+        val deleted = employeeService.findByName(employee.name)
+
+        assertNotNull(deleted)
 
         assertTrue {
-            employeeService.findByName(employee.name) != null
-        }
-
-        entityManager.detach(employee)
-        found = employeeService.findByName(employee.name)!!
-        found.deleted = System.currentTimeMillis()
-        employeeRepository.save(found)
-        employeeRepository.flush()
-
-        assertTrue { found.deleted > 0 }
-
-        assertTrue {
-            employeeService.findByName(employee.name)?.deleted!! > 0
+            deleted.deleted > 0
         }
 
     }
