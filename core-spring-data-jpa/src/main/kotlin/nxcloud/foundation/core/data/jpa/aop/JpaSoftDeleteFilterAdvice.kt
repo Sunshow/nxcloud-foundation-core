@@ -1,7 +1,8 @@
 package nxcloud.foundation.core.data.jpa.aop
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import jakarta.persistence.EntityManagerFactory
+import jakarta.persistence.EntityManager
+import jakarta.persistence.PersistenceContext
 import nxcloud.foundation.core.data.jpa.constant.JpaConstants
 import nxcloud.foundation.core.data.support.context.DataQueryContextHolder
 import nxcloud.foundation.core.data.support.enumeration.DataQueryMode
@@ -9,23 +10,20 @@ import org.aopalliance.intercept.MethodInterceptor
 import org.aopalliance.intercept.MethodInvocation
 import org.hibernate.Session
 import org.hibernate.UnknownFilterException
-import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties
-import org.springframework.orm.jpa.EntityManagerFactoryUtils
 
 
-open class JpaSoftDeleteFilterAdvice(
-    private val entityManagerFactory: EntityManagerFactory,
-    private val jpaProperties: JpaProperties,
-) : MethodInterceptor {
+open class JpaSoftDeleteFilterAdvice : MethodInterceptor {
 
     private val logger = KotlinLogging.logger {}
 
+    @PersistenceContext
+    private lateinit var entityManager: EntityManager
+
     override fun invoke(invocation: MethodInvocation): Any? {
-        val entityManager = EntityManagerFactoryUtils
-            .getTransactionalEntityManager(
-                entityManagerFactory,
-                jpaProperties.properties
-            )
+        val entityManager = this.entityManager
+            .takeIf {
+                it.isOpen && it.isJoinedToTransaction
+            }
             ?: run {
                 logger
                     .debug {

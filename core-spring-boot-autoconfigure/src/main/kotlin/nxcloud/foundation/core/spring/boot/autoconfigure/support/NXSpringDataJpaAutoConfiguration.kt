@@ -21,7 +21,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer
-import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties
 import org.springframework.boot.autoconfigure.transaction.TransactionManagerCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.orm.jpa.JpaTransactionManager
@@ -71,11 +70,8 @@ class NXSpringDataJpaAutoConfiguration {
     @Bean
     @ConditionalOnProperty(name = ["nxcloud.jpa.soft-delete.enable"], havingValue = "true", matchIfMissing = true)
     @ConditionalOnMissingBean(name = ["jpaSoftDeleteFilterAdvice"])
-    fun jpaSoftDeleteFilterAdvice(
-        entityManagerFactory: EntityManagerFactory,
-        jpaProperties: JpaProperties,
-    ): JpaSoftDeleteFilterAdvice {
-        return JpaSoftDeleteFilterAdvice(entityManagerFactory, jpaProperties)
+    fun jpaSoftDeleteFilterAdvice(): JpaSoftDeleteFilterAdvice {
+        return JpaSoftDeleteFilterAdvice()
     }
 
     @Bean
