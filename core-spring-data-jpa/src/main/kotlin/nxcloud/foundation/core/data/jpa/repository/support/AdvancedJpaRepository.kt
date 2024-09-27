@@ -7,6 +7,8 @@ import jakarta.persistence.TypedQuery
 import jakarta.persistence.criteria.Root
 import nxcloud.foundation.core.data.jpa.entity.DeletedField
 import nxcloud.foundation.core.data.support.annotation.EnableSoftDelete
+import nxcloud.foundation.core.data.support.context.DataQueryContextHolder
+import nxcloud.foundation.core.data.support.enumeration.DataQueryMode
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.data.domain.Example
 import org.springframework.data.domain.Page
@@ -184,7 +186,12 @@ class AdvancedJpaRepository<T : Any, ID : Any>(
         val root: Root<T> = cq.from(domainClass)
 
         val idPredicate = cb.equal(root.get<Any>(entityInformation.idAttribute.name), id)
-        cq.where(idPredicate)
+        composeDataQueryContextSpecification<T>(null)
+            ?.toPredicate(root, cq, cb)
+            ?.also {
+                cq.where(cb.and(idPredicate, it))
+            }
+            ?: cq.where(idPredicate)
 
         val query = entityManager.createQuery(cq)
 
@@ -210,4 +217,48 @@ class AdvancedJpaRepository<T : Any, ID : Any>(
     override fun <S : T> save(entity: S): S {
         return super.save(entity)
     }
+
+    /**
+     * 组合 DataQueryContext 包含的额外查询条件
+     */
+    fun <S : T> composeDataQueryContextSpecification(spec: Specification<S>?): Specification<S>? {
+        if (!enableSoftDelete()) {
+            return spec
+        }
+
+        val context = DataQueryContextHolder.currentOrElse()
+
+        logger.debug { "启用全局软删除处理" }
+
+        var softDeleteSpecification: Specification<S> = Specification.where(spec)
+
+        when (context.queryMode) {
+            DataQueryMode.NotDeleted -> {
+                softDeleteSpecification = softDeleteSpecification
+                    .and { root, _, cb ->
+                        cb.equal(root.get<Long>("deleted"), 0)
+                    }
+            }
+
+            DataQueryMode.Deleted -> {
+                softDeleteSpecification = softDeleteSpecification
+                    .and { root, _, cb ->
+                        cb.greaterThan(root.get("deleted"), context.deletedAfter)
+                    }
+
+                if (context.deletedBefore > 0) {
+                    softDeleteSpecification = softDeleteSpecification
+                        .and { root, _, cb ->
+                            cb.lessThan(root.get("deleted"), context.deletedBefore)
+                        }
+                }
+            }
+
+            else -> {
+            }
+        }
+
+        return softDeleteSpecification
+    }
+
 }
