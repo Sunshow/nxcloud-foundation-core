@@ -1,7 +1,11 @@
 package nxcloud.foundation.core.data.jpa.repository.support
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.persistence.EntityManager
 import jakarta.persistence.TypedQuery
+import nxcloud.foundation.core.data.jpa.entity.DeletedField
+import nxcloud.foundation.core.data.support.annotation.EnableSoftDelete
+import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.data.domain.Example
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -23,6 +27,8 @@ open class AdvancedJpaRepository<T : Any, ID : Any>(
     private val entityManager: EntityManager,
 ) : SimpleJpaRepository<T, ID>(entityInformation, entityManager) {
 
+    private val logger = KotlinLogging.logger {}
+
     constructor(domainClass: Class<T>, em: EntityManager) : this(
         JpaEntityInformationSupport
             .getEntityInformation(
@@ -31,6 +37,17 @@ open class AdvancedJpaRepository<T : Any, ID : Any>(
             ),
         em,
     )
+
+    private val enableSoftDelete: EnableSoftDelete? by lazy {
+        AnnotationUtils.findAnnotation(entityInformation.javaType, EnableSoftDelete::class.java)
+    }
+
+    /**
+     * 是否启用了软删除
+     */
+    fun enableSoftDelete(): Boolean {
+        return enableSoftDelete != null
+    }
 
     /**
      * 暴露实体类型
@@ -103,16 +120,12 @@ open class AdvancedJpaRepository<T : Any, ID : Any>(
 
     @Transactional
     override fun delete(entity: T) {
-        super.delete(entity)
-    }
-
-    @Transactional
-    override fun deleteById(id: ID) {
-        super.deleteById(id)
-    }
-
-    override fun findAllById(ids: MutableIterable<ID>): MutableList<T> {
-        return super.findAllById(ids)
+        if (enableSoftDelete() && entity is DeletedField) {
+            (entity as DeletedField).deleted = System.currentTimeMillis()
+            entityManager.merge(entity)
+        } else {
+            super.delete(entity)
+        }
     }
 
     override fun existsById(id: ID): Boolean {
