@@ -8,6 +8,7 @@ import nxcloud.foundation.core.data.support.enumeration.DataQueryMode
 import nxcloud.foundation.core.data.support.listener.DefaultPostEntityLifecycleListenerRegistrationBean
 import nxcloud.foundation.core.spring.boot.autoconfigure.support.NXSpringDataJpaAutoConfiguration
 import nxcloud.foundation.core.spring.boot.autoconfigure.support.NXSpringSupportAutoConfiguration
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
@@ -15,6 +16,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.aop.AopAutoConfiguration
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer
+import org.springframework.boot.runApplication
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
@@ -25,7 +27,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 
-//@Disabled
+@Disabled
 @DataJpaTest
 @EntityScan
 @ImportAutoConfiguration(classes = [AopAutoConfiguration::class, NXSpringSupportAutoConfiguration::class, NXSpringDataJpaAutoConfiguration::class])
@@ -117,7 +119,7 @@ class EmployeeIntegrationTest {
 
 
 @SpringBootApplication
-class App {
+class TestApp {
 
     @Bean
     fun identifierGeneratorStrategyHibernatePropertiesCustomizer(): HibernatePropertiesCustomizer {
@@ -151,4 +153,8 @@ class App {
         return TestJpaSessionFactoryInterceptor()
     }
 
+}
+
+fun main(args: Array<String>) {
+    runApplication<TestApp>(*args)
 }

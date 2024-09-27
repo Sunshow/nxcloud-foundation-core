@@ -2,6 +2,7 @@ package nxcloud.foundation.core.data.jpa.repository.support
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.persistence.EntityManager
+import jakarta.persistence.NoResultException
 import jakarta.persistence.TypedQuery
 import jakarta.persistence.criteria.Root
 import nxcloud.foundation.core.data.jpa.entity.DeletedField
@@ -54,10 +55,6 @@ class AdvancedJpaRepository<T : Any, ID : Any>(
         PersistenceProvider.fromEntityManager(entityManager)
     }
 
-    private val metadata: CrudMethodMetadata? by lazy {
-        super.getRepositoryMethodMetadata()
-    }
-
     /**
      * 是否启用了软删除
      */
@@ -93,7 +90,7 @@ class AdvancedJpaRepository<T : Any, ID : Any>(
                 hints[t] = u
             }
 
-        metadata
+        repositoryMethodMetadata
             ?.also {
                 applyComment(it) { key, value ->
                     hints[key] = value
@@ -190,8 +187,8 @@ class AdvancedJpaRepository<T : Any, ID : Any>(
         cq.where(idPredicate)
 
         val query = entityManager.createQuery(cq)
-        
-        metadata
+
+        repositoryMethodMetadata
             ?.lockModeType
             ?.also {
                 query.setLockMode(it)
@@ -202,7 +199,11 @@ class AdvancedJpaRepository<T : Any, ID : Any>(
                 query.setHint(k, v)
             }
 
-        return Optional.ofNullable(query.singleResult)
+        return try {
+            Optional.of(query.singleResult)
+        } catch (e: NoResultException) {
+            Optional.empty()
+        }
     }
 
     @Transactional

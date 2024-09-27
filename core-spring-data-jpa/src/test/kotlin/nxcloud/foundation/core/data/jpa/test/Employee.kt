@@ -1,6 +1,7 @@
 package nxcloud.foundation.core.data.jpa.test
 
 import jakarta.persistence.Entity
+import jakarta.persistence.LockModeType
 import jakarta.persistence.Table
 import nxcloud.foundation.core.data.jpa.entity.SoftDeleteJpaEntity
 import nxcloud.foundation.core.data.support.annotation.EnableSoftDelete
@@ -8,10 +9,13 @@ import org.hibernate.annotations.DynamicInsert
 import org.hibernate.annotations.DynamicUpdate
 import org.hibernate.envers.Audited
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Lock
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 
+@EnableSoftDelete
 @Audited
 @DynamicInsert
 @DynamicUpdate
@@ -23,6 +27,9 @@ class Employee(
 
 interface EmployeeRepository : JpaRepository<Employee, Long> {
     fun findByName(name: String): Employee?
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    override fun deleteById(id: Long)
 }
 
 interface EmployeeService {
@@ -33,6 +40,10 @@ interface EmployeeService {
     fun saveByName(name: String): Employee
 
     fun deleteByName(name: String): Employee?
+
+    fun deleteById(id: Long)
+
+    fun getById(id: Long): Employee?
 }
 
 abstract class EmployeeServiceImpl(protected val employeeRepository: EmployeeRepository) : EmployeeService {
@@ -70,4 +81,14 @@ class ChildEmployeeServiceImpl(employeeRepository: EmployeeRepository) :
                 deleted = System.currentTimeMillis()
             }
     }
+
+    @Transactional
+    override fun deleteById(id: Long) {
+        employeeRepository.deleteById(id)
+    }
+
+    override fun getById(id: Long): Employee? {
+        return employeeRepository.findByIdOrNull(id)
+    }
+
 }
