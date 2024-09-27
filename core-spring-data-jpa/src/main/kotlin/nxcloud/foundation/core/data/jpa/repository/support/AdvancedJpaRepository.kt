@@ -18,7 +18,7 @@ import java.util.function.Function
 
 @Repository
 @Transactional(readOnly = true)
-open class AdvancedJpaRepository<T : Any, ID>(
+open class AdvancedJpaRepository<T : Any, ID : Any>(
     entityInformation: JpaEntityInformation<T, *>,
     private val entityManager: EntityManager,
 ) : SimpleJpaRepository<T, ID>(entityInformation, entityManager) {
@@ -65,22 +65,24 @@ open class AdvancedJpaRepository<T : Any, ID>(
         super.deleteAllByIdInBatch(ids)
     }
 
+    @Transactional
     override fun deleteAllInBatch() {
         super.deleteAllInBatch()
     }
 
+    @Transactional
     override fun deleteAllInBatch(entities: MutableIterable<T>) {
         super.deleteAllInBatch(entities)
     }
 
-    override fun <S : T, R : Any?> findBy(
+    override fun <S : T, R : Any> findBy(
         example: Example<S>,
         queryFunction: Function<FluentQuery.FetchableFluentQuery<S>, R>
     ): R {
         return super.findBy(example, queryFunction)
     }
 
-    override fun <S : T, R : Any?> findBy(
+    override fun <S : T, R : Any> findBy(
         spec: Specification<T>,
         queryFunction: Function<FluentQuery.FetchableFluentQuery<S>, R>
     ): R {
@@ -95,52 +97,22 @@ open class AdvancedJpaRepository<T : Any, ID>(
         return super.exists(spec)
     }
 
-    override fun <S : T> findOne(example: Example<S>): Optional<S> {
-        return super.findOne(example)
-    }
-
-    override fun findOne(spec: Specification<T>): Optional<T> {
-        return super.findOne(spec)
-    }
-
-    override fun deleteAll(entities: MutableIterable<T>) {
-        super.deleteAll(entities)
-    }
-
     override fun delete(spec: Specification<T>): Long {
         return super.delete(spec)
     }
 
+    @Transactional
     override fun delete(entity: T) {
         super.delete(entity)
     }
 
+    @Transactional
     override fun deleteById(id: ID) {
         super.deleteById(id)
     }
 
-    override fun <S : T> count(example: Example<S>): Long {
-        return super.count(example)
-    }
-
     override fun findAllById(ids: MutableIterable<ID>): MutableList<T> {
         return super.findAllById(ids)
-    }
-
-    override fun <S : T> findAll(example: Example<S>, pageable: Pageable): Page<S> {
-        return super.findAll(example, pageable)
-    }
-
-    override fun <S : T> findAll(example: Example<S>, sort: Sort): MutableList<S> {
-        return super.findAll(example, sort)
-    }
-
-    override fun <S : T> findAll(example: Example<S>): MutableList<S> {
-        return super.findAll(example)
-    }
-
-    override fun findAll(spec: Specification<T>, pageable: Pageable): Page<T> {
-        return super.findAll(spec, pageable)
     }
 
     override fun existsById(id: ID): Boolean {
