@@ -11,8 +11,6 @@ import nxcloud.foundation.core.data.support.context.DataQueryContextHolder
 import nxcloud.foundation.core.data.support.enumeration.DataQueryMode
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.data.domain.Example
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.provider.PersistenceProvider
@@ -103,26 +101,12 @@ class AdvancedJpaRepository<T : Any, ID : Any>(
     }
 
     override fun <S : T> getCountQuery(spec: Specification<S>?, domainClass: Class<S>): TypedQuery<Long> {
-        return super.getCountQuery(spec, domainClass)
+        return super.getCountQuery(composeDataQueryContextSpecification(spec), domainClass)
     }
 
     override fun <S : T> getQuery(spec: Specification<S>?, domainClass: Class<S>, sort: Sort): TypedQuery<S> {
-        return super.getQuery(spec, domainClass, sort)
+        return super.getQuery(composeDataQueryContextSpecification(spec), domainClass, sort)
     }
-
-    override fun <S : T> readPage(
-        query: TypedQuery<S>,
-        domainClass: Class<S>,
-        pageable: Pageable,
-        spec: Specification<S>?
-    ): Page<S> {
-        return super.readPage(query, domainClass, pageable, spec)
-    }
-
-    override fun getReferenceById(id: ID): T {
-        return super.getReferenceById(id)
-    }
-
 
     override fun deleteAllByIdInBatch(ids: MutableIterable<ID>) {
         super.deleteAllByIdInBatch(ids)
