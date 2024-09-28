@@ -4,7 +4,6 @@ import jakarta.persistence.Entity
 import jakarta.persistence.LockModeType
 import jakarta.persistence.Table
 import nxcloud.foundation.core.data.jpa.entity.SoftDeleteJpaEntity
-import nxcloud.foundation.core.data.support.annotation.EnableSoftDelete
 import org.hibernate.annotations.DynamicInsert
 import org.hibernate.annotations.DynamicUpdate
 import org.hibernate.envers.Audited
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 
-@EnableSoftDelete
 @Audited
 @DynamicInsert
 @DynamicUpdate
@@ -66,7 +64,6 @@ abstract class EmployeeServiceImpl(protected val employeeRepository: EmployeeRep
 
 // 测试注解加在子类
 @Transactional(readOnly = true)
-@EnableSoftDelete
 @Service
 class ChildEmployeeServiceImpl(employeeRepository: EmployeeRepository) :
     EmployeeServiceImpl(employeeRepository) {

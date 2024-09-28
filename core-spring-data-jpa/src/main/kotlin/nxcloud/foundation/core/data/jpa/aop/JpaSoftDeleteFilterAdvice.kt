@@ -11,7 +11,7 @@ import org.aopalliance.intercept.MethodInvocation
 import org.hibernate.Session
 import org.hibernate.UnknownFilterException
 
-
+@Deprecated("Use nxcloud.foundation.core.data.jpa.repository.support.AdvancedJpaRepository")
 open class JpaSoftDeleteFilterAdvice : MethodInterceptor {
 
     private val logger = KotlinLogging.logger {}

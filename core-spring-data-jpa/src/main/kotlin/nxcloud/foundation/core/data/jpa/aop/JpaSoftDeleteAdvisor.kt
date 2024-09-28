@@ -7,6 +7,7 @@ import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor
 import org.springframework.core.annotation.AnnotationUtils
 import java.lang.reflect.Method
 
+@Deprecated("Use nxcloud.foundation.core.data.jpa.repository.support.AdvancedJpaRepository")
 open class JpaSoftDeleteAdvisor(advice: Advice) : StaticMethodMatcherPointcutAdvisor(advice) {
 
     override fun matches(method: Method, targetClass: Class<*>): Boolean {
