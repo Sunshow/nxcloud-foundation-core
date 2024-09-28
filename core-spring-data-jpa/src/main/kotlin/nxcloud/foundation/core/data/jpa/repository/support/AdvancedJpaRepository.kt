@@ -33,7 +33,7 @@ import java.util.function.Function
 
 @Repository
 @Transactional(readOnly = true)
-class AdvancedJpaRepository<T : Any, ID : Any>(
+class AdvancedJpaRepository<T : Any, ID>(
     private val entityInformation: JpaEntityInformation<T, *>,
     private val entityManager: EntityManager,
 ) : SimpleJpaRepository<T, ID>(entityInformation, entityManager) {
@@ -206,7 +206,8 @@ class AdvancedJpaRepository<T : Any, ID : Any>(
         return super.getQuery(composeDataQueryContextSpecification(spec), domainClass, sort)
     }
 
-    override fun deleteAllByIdInBatch(ids: MutableIterable<ID>) {
+    @JvmSuppressWildcards
+    override fun deleteAllByIdInBatch(ids: Iterable<ID>) {
         if (enableSoftDelete()) {
             val cb = entityManager.criteriaBuilder
             val update = cb.createCriteriaUpdate(domainClass)
@@ -248,8 +249,9 @@ class AdvancedJpaRepository<T : Any, ID : Any>(
         // super.deleteAll()
     }
 
+    @JvmSuppressWildcards
     @Transactional
-    override fun deleteAllInBatch(entities: MutableIterable<T>) {
+    override fun deleteAllInBatch(entities: Iterable<T>) {
         if (enableSoftDelete()) {
             logger.debug {
                 "启用软删除, 仅标记删除时间, domainClass=${domainClass}"
