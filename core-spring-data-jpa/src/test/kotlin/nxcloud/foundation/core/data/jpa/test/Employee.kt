@@ -8,6 +8,7 @@ import nxcloud.foundation.core.data.support.annotation.EnableSoftDelete
 import org.hibernate.annotations.DynamicInsert
 import org.hibernate.annotations.DynamicUpdate
 import org.hibernate.envers.Audited
+import org.springframework.data.domain.Example
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Lock
 import org.springframework.data.repository.findByIdOrNull
@@ -30,6 +31,7 @@ interface EmployeeRepository : JpaRepository<Employee, Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     override fun deleteById(id: Long)
+
 }
 
 interface EmployeeService {
@@ -44,6 +46,14 @@ interface EmployeeService {
     fun deleteById(id: Long)
 
     fun getById(id: Long): Employee?
+
+    fun deleteAllByIdInBatch(ids: List<Long>)
+
+    fun deleteAll()
+
+    fun deleteAllInBatch()
+
+    fun exists(example: Example<Employee>): Boolean
 }
 
 abstract class EmployeeServiceImpl(protected val employeeRepository: EmployeeRepository) : EmployeeService {
@@ -89,6 +99,25 @@ class ChildEmployeeServiceImpl(employeeRepository: EmployeeRepository) :
 
     override fun getById(id: Long): Employee? {
         return employeeRepository.findByIdOrNull(id)
+    }
+
+    @Transactional
+    override fun deleteAllByIdInBatch(ids: List<Long>) {
+        employeeRepository.deleteAllByIdInBatch(ids)
+    }
+
+    @Transactional
+    override fun deleteAll() {
+        employeeRepository.deleteAll()
+    }
+
+    @Transactional
+    override fun deleteAllInBatch() {
+        employeeRepository.deleteAllInBatch()
+    }
+
+    override fun exists(example: Example<Employee>): Boolean {
+        return employeeRepository.exists(example)
     }
 
 }
