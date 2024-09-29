@@ -51,10 +51,6 @@ class AdvancedJpaRepository<T : Any, ID>(
         em,
     )
 
-    companion object {
-        private const val ID_MUST_NOT_BE_NULL = "The given id must not be null"
-    }
-
     private val enableSoftDelete: EnableSoftDelete? by lazy {
         AnnotationUtils.findAnnotation(entityInformation.javaType, EnableSoftDelete::class.java)
     }
@@ -352,8 +348,6 @@ class AdvancedJpaRepository<T : Any, ID>(
     }
 
     override fun findById(id: ID): Optional<T> {
-        Assert.notNull(id, ID_MUST_NOT_BE_NULL)
-
         val cb = entityManager.criteriaBuilder
         val cq = cb.createQuery(domainClass)
         val root: Root<T> = cq.from(domainClass)
