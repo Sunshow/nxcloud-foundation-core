@@ -48,7 +48,9 @@ allprojects {
 
 /** Configure building for Java+Kotlin projects. */
 subprojects {
-    val project = this@subprojects
+    if (project.name == "core-bom") {
+        return@subprojects
+    }
 
     apply(plugin = "java-library")
     apply(plugin = "org.jetbrains.kotlin.jvm")
@@ -130,14 +132,17 @@ subprojects {
 }
 
 subprojects {
+    // 发布 release
+    version = "0.6.4"
+
+    if (project.name == "core-bom") {
+        return@subprojects
+    }
+
     apply(plugin = "maven-publish")
     apply(plugin = "signing")
 
     publishing {
-
-        // 发布 release
-        version = "0.6.3"
-
         val sourcesJar by tasks.registering(Jar::class) {
             archiveClassifier.set("sources")
             from(sourceSets.main.get().allSource)
