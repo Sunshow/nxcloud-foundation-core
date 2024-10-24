@@ -1,0 +1,62 @@
+package nxcloud.foundation.core.data.jpa.repository.support
+
+import jakarta.persistence.EntityManager
+import org.springframework.data.jpa.repository.query.AdvancedJpaQueryLookupStrategy
+import org.springframework.data.jpa.repository.query.EscapeCharacter
+import org.springframework.data.jpa.repository.query.JpaQueryMethodFactory
+import org.springframework.data.jpa.repository.query.QueryRewriterProvider
+import org.springframework.data.jpa.repository.support.JpaRepositoryFactory
+import org.springframework.data.repository.core.RepositoryMetadata
+import org.springframework.data.repository.query.QueryLookupStrategy
+import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider
+import java.util.*
+
+open class AdvancedJpaRepositoryFactory(
+    em: EntityManager,
+) : JpaRepositoryFactory(em) {
+
+    private val entityManager by lazy {
+        acquireParentPrivateProperty<EntityManager>("entityManager")
+    }
+
+    private val queryMethodFactory by lazy {
+        acquireParentPrivateProperty<JpaQueryMethodFactory>("queryMethodFactory")
+    }
+
+    private val queryRewriterProvider by lazy {
+        acquireParentPrivateProperty<QueryRewriterProvider>("queryRewriterProvider")
+    }
+
+    private val escapeCharacter by lazy {
+        acquireParentPrivateProperty<EscapeCharacter>("escapeCharacter")
+    }
+
+    /**
+     * 反射获取父类属性
+     */
+    @Suppress("UNCHECKED_CAST")
+    private fun <T> acquireParentPrivateProperty(propertyName: String): T {
+        return this::class.java.superclass!!.getDeclaredField(propertyName)
+            .apply {
+                trySetAccessible()
+            }
+            .get(this) as T
+    }
+
+    override fun getRepositoryBaseClass(metadata: RepositoryMetadata): Class<*> {
+        return AdvancedJpaRepository::class.java
+    }
+
+    override fun getQueryLookupStrategy(
+        key: QueryLookupStrategy.Key?,
+        evaluationContextProvider: QueryMethodEvaluationContextProvider,
+    ): Optional<QueryLookupStrategy> {
+        return Optional.of(
+            AdvancedJpaQueryLookupStrategy
+                .create(
+                    entityManager, queryMethodFactory, key, evaluationContextProvider,
+                    queryRewriterProvider, escapeCharacter
+                )
+        )
+    }
+}

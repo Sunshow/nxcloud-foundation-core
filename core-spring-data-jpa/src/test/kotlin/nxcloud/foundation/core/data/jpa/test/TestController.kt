@@ -20,6 +20,12 @@ class TestController(
             }
     }
 
+    @RequestMapping("/findByName")
+    fun findByName(name: String): Employee? {
+        val employee = employeeService.findByName(name)
+        return employee
+    }
+
     @RequestMapping("/deleteById")
     fun deleteById(id: Long): Employee? {
         val employee = employeeService.getById(id)

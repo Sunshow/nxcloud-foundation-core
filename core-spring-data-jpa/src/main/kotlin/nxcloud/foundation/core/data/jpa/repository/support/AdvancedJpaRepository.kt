@@ -10,10 +10,6 @@ import jakarta.persistence.criteria.CriteriaQuery
 import jakarta.persistence.criteria.Predicate
 import jakarta.persistence.criteria.Root
 import nxcloud.foundation.core.data.jpa.entity.DeletedField
-import nxcloud.foundation.core.data.support.annotation.EnableSoftDelete
-import nxcloud.foundation.core.data.support.context.DataQueryContextHolder
-import nxcloud.foundation.core.data.support.enumeration.DataQueryMode
-import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.data.domain.Example
 import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.convert.QueryByExamplePredicateBuilder
@@ -27,7 +23,6 @@ import org.springframework.data.jpa.repository.support.SimpleJpaRepository
 import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.util.Assert
 import java.util.*
 import java.util.function.Function
 
@@ -51,9 +46,7 @@ class AdvancedJpaRepository<T : Any, ID>(
         em,
     )
 
-    private val enableSoftDelete: EnableSoftDelete? by lazy {
-        AnnotationUtils.findAnnotation(entityInformation.javaType, EnableSoftDelete::class.java)
-    }
+    private val advancedJpaSupporter = AdvancedJpaSupporter(entityInformation, entityManager)
 
     private val provider: PersistenceProvider by lazy {
         PersistenceProvider.fromEntityManager(entityManager)
@@ -82,13 +75,6 @@ class AdvancedJpaRepository<T : Any, ID>(
         queryFunction: Function<FetchableFluentQuery<S>, R>,
     ): R {
         return doFindByMethod.invoke(this, spec, domainClass, queryFunction) as R
-    }
-
-    /**
-     * 是否启用了软删除
-     */
-    fun enableSoftDelete(): Boolean {
-        return enableSoftDelete != null
     }
 
     /**
@@ -195,16 +181,16 @@ class AdvancedJpaRepository<T : Any, ID>(
     }
 
     override fun <S : T> getCountQuery(spec: Specification<S>?, domainClass: Class<S>): TypedQuery<Long> {
-        return super.getCountQuery(composeDataQueryContextSpecification(spec), domainClass)
+        return super.getCountQuery(advancedJpaSupporter.composeDataQueryContextSpecification(spec), domainClass)
     }
 
     override fun <S : T> getQuery(spec: Specification<S>?, domainClass: Class<S>, sort: Sort): TypedQuery<S> {
-        return super.getQuery(composeDataQueryContextSpecification(spec), domainClass, sort)
+        return super.getQuery(advancedJpaSupporter.composeDataQueryContextSpecification(spec), domainClass, sort)
     }
 
     @JvmSuppressWildcards
     override fun deleteAllByIdInBatch(ids: Iterable<ID>) {
-        if (enableSoftDelete()) {
+        if (advancedJpaSupporter.enableSoftDelete()) {
             val cb = entityManager.criteriaBuilder
             val update = cb.createCriteriaUpdate(domainClass)
             val root = update.from(domainClass)
@@ -217,7 +203,7 @@ class AdvancedJpaRepository<T : Any, ID>(
 
             val idPredicate = root.get<Any>(entityInformation.idAttribute.name).`in`(ids.toList())
 
-            composeDataQueryContextSpecification<T>(null)
+            advancedJpaSupporter.composeDataQueryContextSpecification<T>(null)
                 ?.toPredicate(root, cb.createQuery(), cb)
                 ?.also {
                     update.where(cb.and(idPredicate, it))
@@ -248,7 +234,7 @@ class AdvancedJpaRepository<T : Any, ID>(
     @JvmSuppressWildcards
     @Transactional
     override fun deleteAllInBatch(entities: Iterable<T>) {
-        if (enableSoftDelete()) {
+        if (advancedJpaSupporter.enableSoftDelete()) {
             logger.debug {
                 "启用软删除, 仅标记删除时间, domainClass=${domainClass}"
             }
@@ -273,7 +259,7 @@ class AdvancedJpaRepository<T : Any, ID>(
         val spec = ExampleSpecification(example, escapeCharacter)
         val probeType = example.probeType
         return executeDoFindBy(
-            composeDataQueryContextSpecification(spec) as (Specification<T>),
+            advancedJpaSupporter.composeDataQueryContextSpecification(spec) as (Specification<T>),
             probeType as Class<T>,
             queryFunction,
         )
@@ -283,7 +269,7 @@ class AdvancedJpaRepository<T : Any, ID>(
         spec: Specification<T>,
         queryFunction: Function<FetchableFluentQuery<S>, R>
     ): R {
-        return super.findBy(composeDataQueryContextSpecification(spec)!!, queryFunction)
+        return super.findBy(advancedJpaSupporter.composeDataQueryContextSpecification(spec)!!, queryFunction)
     }
 
     override fun <S : T> exists(example: Example<S>): Boolean {
@@ -295,18 +281,22 @@ class AdvancedJpaRepository<T : Any, ID>(
             .createQuery(Int::class.java) //
             .select(entityManager.criteriaBuilder.literal(1))
 
-        applySpecificationToCriteria(composeDataQueryContextSpecification(spec), example.probeType, cq)
+        applySpecificationToCriteria(
+            advancedJpaSupporter.composeDataQueryContextSpecification(spec),
+            example.probeType,
+            cq
+        )
 
         val query = applyRepositoryMethodMetadata(entityManager.createQuery(cq))
         return query.setMaxResults(1).resultList.size == 1
     }
 
     override fun exists(spec: Specification<T>): Boolean {
-        return super.exists(composeDataQueryContextSpecification(spec)!!)
+        return super.exists(advancedJpaSupporter.composeDataQueryContextSpecification(spec)!!)
     }
 
     override fun delete(spec: Specification<T>): Long {
-        if (enableSoftDelete()) {
+        if (advancedJpaSupporter.enableSoftDelete()) {
             val cb = entityManager.criteriaBuilder
             val update = cb.createCriteriaUpdate(domainClass)
             val root = update.from(domainClass)
@@ -317,7 +307,7 @@ class AdvancedJpaRepository<T : Any, ID>(
 
             update.set(root.get("deleted"), System.currentTimeMillis())
 
-            composeDataQueryContextSpecification(spec)!!
+            advancedJpaSupporter.composeDataQueryContextSpecification(spec)!!
                 .toPredicate(root, cb.createQuery(), cb)
                 .also {
                     update.where(it)
@@ -326,13 +316,13 @@ class AdvancedJpaRepository<T : Any, ID>(
             // Execute the update
             return entityManager.createQuery(update).executeUpdate().toLong()
         } else {
-            return super.delete(composeDataQueryContextSpecification(spec)!!)
+            return super.delete(advancedJpaSupporter.composeDataQueryContextSpecification(spec)!!)
         }
     }
 
     @Transactional
     override fun delete(entity: T) {
-        if (enableSoftDelete() && entity is DeletedField) {
+        if (advancedJpaSupporter.enableSoftDelete() && entity is DeletedField) {
             logger.debug {
                 "启用软删除, 仅标记删除时间, domainClass=${domainClass}"
             }
@@ -354,7 +344,7 @@ class AdvancedJpaRepository<T : Any, ID>(
 
         val idPredicate = cb.equal(root.get<Any>(entityInformation.idAttribute.name), id)
 
-        composeDataQueryContextSpecification<T>(null)
+        advancedJpaSupporter.composeDataQueryContextSpecification<T>(null)
             ?.toPredicate(root, cq, cb)
             ?.also {
                 cq.where(cb.and(idPredicate, it))
@@ -384,49 +374,6 @@ class AdvancedJpaRepository<T : Any, ID>(
     @Transactional
     override fun <S : T> save(entity: S): S {
         return super.save(entity)
-    }
-
-    /**
-     * 组合 DataQueryContext 包含的额外查询条件
-     */
-    fun <S : T> composeDataQueryContextSpecification(spec: Specification<S>?): Specification<S>? {
-        if (!enableSoftDelete()) {
-            return spec
-        }
-
-        val context = DataQueryContextHolder.currentOrElse()
-
-        logger.debug { "启用全局软删除处理" }
-
-        var softDeleteSpecification: Specification<S> = Specification.where(spec)
-
-        when (context.queryMode) {
-            DataQueryMode.NotDeleted -> {
-                softDeleteSpecification = softDeleteSpecification
-                    .and { root, _, cb ->
-                        cb.equal(root.get<Long>("deleted"), 0)
-                    }
-            }
-
-            DataQueryMode.Deleted -> {
-                softDeleteSpecification = softDeleteSpecification
-                    .and { root, _, cb ->
-                        cb.greaterThan(root.get("deleted"), context.deletedAfter)
-                    }
-
-                if (context.deletedBefore > 0) {
-                    softDeleteSpecification = softDeleteSpecification
-                        .and { root, _, cb ->
-                            cb.lessThan(root.get("deleted"), context.deletedBefore)
-                        }
-                }
-            }
-
-            else -> {
-            }
-        }
-
-        return softDeleteSpecification
     }
 
     class ExampleSpecification<T> internal constructor(

@@ -35,7 +35,7 @@ public class EmployeeJavaIntegrationTest {
 
     @Test
     void testPersistent() {
-        Employee employee = new Employee("John");
+        Employee employee = new Employee("John", 18, false);
         entityManager.persist(employee);
         entityManager.flush();
 

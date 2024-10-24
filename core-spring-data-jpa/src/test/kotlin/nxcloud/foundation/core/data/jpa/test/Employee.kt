@@ -22,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional
 @Table(name = "test_employee")
 class Employee(
     var name: String,
+    var age: Int = 0,
+    var male: Boolean = true,
 ) : SoftDeleteJpaEntity()
 
 interface EmployeeRepository : JpaRepository<Employee, Long> {
@@ -29,6 +31,8 @@ interface EmployeeRepository : JpaRepository<Employee, Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     override fun deleteById(id: Long)
+
+    fun findByNameAndAge(name: String, age: Int): List<Employee>
 
 }
 
@@ -40,6 +44,8 @@ interface EmployeeService {
     fun saveByName(name: String): Employee
 
     fun deleteByName(name: String): Employee?
+
+    fun findByNameAndAge(name: String, age: Int): List<Employee>
 
     fun deleteById(id: Long)
 
@@ -117,4 +123,7 @@ class ChildEmployeeServiceImpl(employeeRepository: EmployeeRepository) :
         return employeeRepository.exists(example)
     }
 
+    override fun findByNameAndAge(name: String, age: Int): List<Employee> {
+        return employeeRepository.findByNameAndAge(name, age)
+    }
 }
