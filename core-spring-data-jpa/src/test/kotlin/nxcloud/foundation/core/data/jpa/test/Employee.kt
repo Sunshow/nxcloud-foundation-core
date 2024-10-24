@@ -8,6 +8,8 @@ import org.hibernate.annotations.DynamicInsert
 import org.hibernate.annotations.DynamicUpdate
 import org.hibernate.envers.Audited
 import org.springframework.data.domain.Example
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Lock
 import org.springframework.data.repository.findByIdOrNull
@@ -32,7 +34,7 @@ interface EmployeeRepository : JpaRepository<Employee, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     override fun deleteById(id: Long)
 
-    fun findByNameAndAge(name: String, age: Int): List<Employee>
+    fun findByNameAndAge(name: String, age: Int, page: Pageable): Page<Employee>
 
 }
 
@@ -124,6 +126,6 @@ class ChildEmployeeServiceImpl(employeeRepository: EmployeeRepository) :
     }
 
     override fun findByNameAndAge(name: String, age: Int): List<Employee> {
-        return employeeRepository.findByNameAndAge(name, age)
+        return employeeRepository.findByNameAndAge(name, age, Pageable.ofSize(1)).toList()
     }
 }

@@ -21,10 +21,13 @@ import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+import nxcloud.foundation.core.data.jpa.repository.support.AdvancedJpaSupporter;
 import org.springframework.data.domain.KeysetScrollPosition;
 import org.springframework.data.domain.OffsetScrollPosition;
 import org.springframework.data.domain.ScrollPosition;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.query.JpaParameters.JpaParameter;
 import org.springframework.data.jpa.repository.query.JpaQueryExecution.DeleteExecution;
 import org.springframework.data.jpa.repository.query.JpaQueryExecution.ExistsExecution;
@@ -62,6 +65,8 @@ public class AdvancedPartTreeJpaQuery extends AbstractJpaQuery {
     private final EscapeCharacter escape;
     private final JpaMetamodelEntityInformation<?, Object> entityInformation;
 
+    private final AdvancedJpaSupporter<?> advancedJpaSupporter;
+
     /**
      * Creates a new {@link AdvancedPartTreeJpaQuery}.
      *
@@ -90,6 +95,8 @@ public class AdvancedPartTreeJpaQuery extends AbstractJpaQuery {
         Class<?> domainClass = method.getEntityInformation().getJavaType();
         PersistenceUnitUtil persistenceUnitUtil = em.getEntityManagerFactory().getPersistenceUnitUtil();
         this.entityInformation = new JpaMetamodelEntityInformation<>(domainClass, em.getMetamodel(), persistenceUnitUtil);
+
+        advancedJpaSupporter = new AdvancedJpaSupporter<>(entityInformation, em);
 
         boolean recreationRequired = parameters.hasDynamicProjection() || parameters.potentiallySortsDynamically()
                 || method.isScrollQuery();
@@ -222,6 +229,7 @@ public class AdvancedPartTreeJpaQuery extends AbstractJpaQuery {
         /**
          * Creates a new {@link Query} for the given parameter values.
          */
+        @SuppressWarnings({"rawtypes", "unchecked"})
         public Query createQuery(JpaParametersParameterAccessor accessor) {
 
             CriteriaQuery<?> criteriaQuery = cachedCriteriaQuery;
@@ -237,6 +245,15 @@ public class AdvancedPartTreeJpaQuery extends AbstractJpaQuery {
 
             if (parameterBinder == null) {
                 throw new IllegalStateException("ParameterBinder is null");
+            }
+
+            // 动态扩展查询条件
+            Specification<?> runtimeSpecification = advancedJpaSupporter.composeDataQueryContextSpecification(null);
+            if (runtimeSpecification != null) {
+                CriteriaBuilder cb = em.getCriteriaBuilder();
+                Root root = criteriaQuery.from(entityInformation.getJavaType());
+
+                criteriaQuery.where(cb.and(criteriaQuery.getRestriction(), runtimeSpecification.toPredicate(root, criteriaQuery, cb)));
             }
 
             TypedQuery<?> query = createQuery(criteriaQuery);
