@@ -32,15 +32,23 @@ open class AdvancedJpaRepositoryFactory(
     }
 
     /**
-     * 反射获取父类属性
+     * 反射获取父类和祖先类的属性
      */
     @Suppress("UNCHECKED_CAST")
     private fun <T> acquireParentPrivateProperty(propertyName: String): T {
-        return this::class.java.superclass!!.getDeclaredField(propertyName)
-            .apply {
-                trySetAccessible()
+        var clazz: Class<*>? = this::class.java
+        while (clazz != null) {
+            try {
+                return clazz.getDeclaredField(propertyName)
+                    .apply {
+                        trySetAccessible()
+                    }
+                    .get(this) as T
+            } catch (e: NoSuchFieldException) {
+                clazz = clazz.superclass
             }
-            .get(this) as T
+        }
+        throw NoSuchFieldException("Field $propertyName not found in class hierarchy")
     }
 
     override fun getRepositoryBaseClass(metadata: RepositoryMetadata): Class<*> {
