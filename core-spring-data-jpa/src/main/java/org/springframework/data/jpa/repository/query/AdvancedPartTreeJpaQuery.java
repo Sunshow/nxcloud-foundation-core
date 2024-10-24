@@ -21,6 +21,7 @@ import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import nxcloud.foundation.core.data.jpa.repository.support.AdvancedJpaSupporter;
 import nxcloud.foundation.core.data.support.context.DataQueryContext;
@@ -242,7 +243,16 @@ public class AdvancedPartTreeJpaQuery extends AbstractJpaQuery {
                 CriteriaBuilder cb = em.getCriteriaBuilder();
                 Root root = criteriaQuery.from(entityInformation.getJavaType());
 
-                criteriaQuery.where(cb.and(criteriaQuery.getRestriction(), runtimeSpecification.toPredicate(root, criteriaQuery, cb)));
+                Predicate originalPredicate = criteriaQuery.getRestriction();
+                Predicate runtimePredicate = runtimeSpecification.toPredicate(root, criteriaQuery, cb);
+
+                if (originalPredicate != null && runtimePredicate != null) {
+                    criteriaQuery.where(cb.and(criteriaQuery.getRestriction(), runtimeSpecification.toPredicate(root, criteriaQuery, cb)));
+                } else if (originalPredicate == null && runtimePredicate != null) {
+                    criteriaQuery.where(runtimePredicate);
+                } else if (originalPredicate != null) {
+                    criteriaQuery.where(originalPredicate);
+                }
             }
             return criteriaQuery;
         }
