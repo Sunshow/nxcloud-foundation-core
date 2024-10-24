@@ -23,6 +23,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import nxcloud.foundation.core.data.jpa.repository.support.AdvancedJpaSupporter;
+import nxcloud.foundation.core.data.support.context.DataQueryContext;
 import org.springframework.data.domain.KeysetScrollPosition;
 import org.springframework.data.domain.OffsetScrollPosition;
 import org.springframework.data.domain.ScrollPosition;
@@ -43,6 +44,8 @@ import org.springframework.data.util.Streamable;
 import org.springframework.lang.Nullable;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A {@link AbstractJpaQuery} implementation based on a {@link PartTree}.
@@ -209,21 +212,39 @@ public class AdvancedPartTreeJpaQuery extends AbstractJpaQuery {
      */
     private class QueryPreparer {
 
-        private final @Nullable CriteriaQuery<?> cachedCriteriaQuery;
+
+        private final @Nullable Map<DataQueryContext, CriteriaQuery<?>> cachedCriteriaQueryMap;
         private final @Nullable ParameterBinder cachedParameterBinder;
         private final QueryParameterSetter.QueryMetadataCache metadataCache = new QueryParameterSetter.QueryMetadataCache();
 
+        private final JpaQueryCreator creator = createCreator(null);
+        ;
+
         QueryPreparer(boolean recreateQueries) {
-
-            JpaQueryCreator creator = createCreator(null);
-
             if (recreateQueries) {
-                this.cachedCriteriaQuery = null;
+                this.cachedCriteriaQueryMap = null;
                 this.cachedParameterBinder = null;
             } else {
-                this.cachedCriteriaQuery = creator.createQuery();
+                this.cachedCriteriaQueryMap = new ConcurrentHashMap<>();
+
+                DataQueryContext dataQueryContext = advancedJpaSupporter.getDataQueryContext();
+                this.cachedCriteriaQueryMap.put(dataQueryContext, extendCriteriaQuery(creator.createQuery()));
+
                 this.cachedParameterBinder = getBinder(creator.getParameterExpressions());
             }
+        }
+
+        @SuppressWarnings({"rawtypes", "unchecked"})
+        private CriteriaQuery<?> extendCriteriaQuery(CriteriaQuery<?> criteriaQuery) {
+            // 动态扩展查询条件
+            Specification<?> runtimeSpecification = advancedJpaSupporter.composeDataQueryContextSpecification(null);
+            if (runtimeSpecification != null) {
+                CriteriaBuilder cb = em.getCriteriaBuilder();
+                Root root = criteriaQuery.from(entityInformation.getJavaType());
+
+                criteriaQuery.where(cb.and(criteriaQuery.getRestriction(), runtimeSpecification.toPredicate(root, criteriaQuery, cb)));
+            }
+            return criteriaQuery;
         }
 
         /**
@@ -232,12 +253,12 @@ public class AdvancedPartTreeJpaQuery extends AbstractJpaQuery {
         @SuppressWarnings({"rawtypes", "unchecked"})
         public Query createQuery(JpaParametersParameterAccessor accessor) {
 
-            CriteriaQuery<?> criteriaQuery = cachedCriteriaQuery;
+            CriteriaQuery<?> criteriaQuery = null;
             ParameterBinder parameterBinder = cachedParameterBinder;
 
-            if (cachedCriteriaQuery == null || accessor.hasBindableNullValue()) {
+            if (cachedCriteriaQueryMap == null || accessor.hasBindableNullValue()) {
                 JpaQueryCreator creator = createCreator(accessor);
-                criteriaQuery = creator.createQuery(getDynamicSort(accessor));
+                criteriaQuery = extendCriteriaQuery(creator.createQuery(getDynamicSort(accessor)));
 
                 List<ParameterMetadata<?>> expressions = creator.getParameterExpressions();
                 parameterBinder = getBinder(expressions);
@@ -247,13 +268,22 @@ public class AdvancedPartTreeJpaQuery extends AbstractJpaQuery {
                 throw new IllegalStateException("ParameterBinder is null");
             }
 
-            // 动态扩展查询条件
-            Specification<?> runtimeSpecification = advancedJpaSupporter.composeDataQueryContextSpecification(null);
-            if (runtimeSpecification != null) {
-                CriteriaBuilder cb = em.getCriteriaBuilder();
-                Root root = criteriaQuery.from(entityInformation.getJavaType());
-
-                criteriaQuery.where(cb.and(criteriaQuery.getRestriction(), runtimeSpecification.toPredicate(root, criteriaQuery, cb)));
+            // 需要缓存的情况 根据当前 context 分别缓存
+            DataQueryContext dataQueryContext = advancedJpaSupporter.getDataQueryContext();
+            if (cachedCriteriaQueryMap != null) {
+                // 缓存CriteriaQuery
+                if (cachedCriteriaQueryMap.containsKey(dataQueryContext)) {
+                    criteriaQuery = cachedCriteriaQueryMap.get(dataQueryContext);
+                } else {
+                    synchronized (cachedCriteriaQueryMap) {
+                        if (cachedCriteriaQueryMap.containsKey(dataQueryContext)) {
+                            criteriaQuery = cachedCriteriaQueryMap.get(dataQueryContext);
+                        } else {
+                            criteriaQuery = extendCriteriaQuery(creator.createQuery());
+                            cachedCriteriaQueryMap.put(dataQueryContext, criteriaQuery);
+                        }
+                    }
+                }
             }
 
             TypedQuery<?> query = createQuery(criteriaQuery);
@@ -309,8 +339,8 @@ public class AdvancedPartTreeJpaQuery extends AbstractJpaQuery {
          */
         private TypedQuery<?> createQuery(CriteriaQuery<?> criteriaQuery) {
 
-            if (this.cachedCriteriaQuery != null) {
-                synchronized (this.cachedCriteriaQuery) {
+            if (this.cachedCriteriaQueryMap != null) {
+                synchronized (this.cachedCriteriaQueryMap) {
                     return getEntityManager().createQuery(criteriaQuery);
                 }
             }
