@@ -37,6 +37,16 @@ class NXSpringDataJpaAutoConfiguration {
 //    }
 
     @Bean
+    @ConditionalOnMissingBean(name = ["advancedStatementInspectorHibernatePropertiesCustomizer"])
+    fun advancedStatementInspectorHibernatePropertiesCustomizer(): HibernatePropertiesCustomizer {
+        return HibernatePropertiesCustomizer {
+            it["hibernate.session_factory.statement_inspector"] =
+                "nxcloud.foundation.core.data.jpa.repository.jdbc.AdvancedStatementInspector"
+        }
+    }
+
+
+    @Bean
     @ConditionalOnMissingBean(EmptyJpaSessionFactoryInterceptor::class)
     fun emptyJpaSessionFactoryInterceptor(): EmptyJpaSessionFactoryInterceptor {
         return EmptyJpaSessionFactoryInterceptor()

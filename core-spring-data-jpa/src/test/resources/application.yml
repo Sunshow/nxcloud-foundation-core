@@ -1,7 +1,3 @@
 spring:
   jpa:
     show-sql: true
-    properties:
-      hibernate:
-        session_factory:
-          statement_inspector: nxcloud.foundation.core.data.jpa.repository.jdbc.AdvancedStatementInspector
