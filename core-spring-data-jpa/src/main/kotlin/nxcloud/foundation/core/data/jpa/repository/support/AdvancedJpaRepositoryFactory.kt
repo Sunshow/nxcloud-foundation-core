@@ -11,10 +11,6 @@ open class AdvancedJpaRepositoryFactory(
     em: EntityManager,
 ) : JpaRepositoryFactory(em) {
 
-    init {
-        println(em.metamodel.entities)
-    }
-
     private val entityManager by lazy {
         acquireParentPrivateProperty<EntityManager>("entityManager")
     }
