@@ -15,6 +15,11 @@ open class AdvancedJpaRepositoryFactory(
     em: EntityManager,
 ) : JpaRepositoryFactory(em) {
 
+    init {
+        // TODO 记录所有受管理的实体类型,
+        println(em.metamodel.entities)
+    }
+
     private val entityManager by lazy {
         acquireParentPrivateProperty<EntityManager>("entityManager")
     }
