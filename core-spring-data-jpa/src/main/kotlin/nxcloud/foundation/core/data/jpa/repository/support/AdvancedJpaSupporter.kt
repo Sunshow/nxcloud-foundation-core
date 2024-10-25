@@ -2,11 +2,11 @@ package nxcloud.foundation.core.data.jpa.repository.support
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.persistence.EntityManager
-import nxcloud.foundation.core.data.support.annotation.EnableSoftDelete
+import nxcloud.foundation.core.data.jpa.entity.JpaEntityMetadata
 import nxcloud.foundation.core.data.support.context.DataQueryContext
 import nxcloud.foundation.core.data.support.context.DataQueryContextHolder
 import nxcloud.foundation.core.data.support.enumeration.DataQueryMode
-import org.springframework.core.annotation.AnnotationUtils
+import nxcloud.foundation.core.spring.support.context.SpringContextHelper
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.support.JpaEntityInformation
 
@@ -17,15 +17,16 @@ class AdvancedJpaSupporter<T>(
 
     private val logger = KotlinLogging.logger {}
 
-    private val enableSoftDelete: EnableSoftDelete? by lazy {
-        AnnotationUtils.findAnnotation(entityInformation.javaType, EnableSoftDelete::class.java)
+    private val entityMetadata: JpaEntityMetadata by lazy {
+        val jpaEntitySupporter = SpringContextHelper.getBean(JpaEntitySupporter::class.java)
+        jpaEntitySupporter.getMetadataByEntityType(entityInformation.javaType)!!
     }
 
     /**
      * 是否启用了软删除
      */
     fun enableSoftDelete(): Boolean {
-        return enableSoftDelete != null
+        return entityMetadata.enableSoftDelete
     }
 
     fun getDataQueryContext(): DataQueryContext = DataQueryContextHolder.currentOrElse()
@@ -34,7 +35,7 @@ class AdvancedJpaSupporter<T>(
      * 组合 DataQueryContext 包含的额外查询条件
      */
     fun <S : T> composeDataQueryContextSpecification(spec: Specification<S>?): Specification<S>? {
-        if (!enableSoftDelete()) {
+        if (!entityMetadata.enableSoftDelete) {
             return spec
         }
 

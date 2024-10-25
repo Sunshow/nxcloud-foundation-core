@@ -1,22 +1,17 @@
 package nxcloud.foundation.core.data.jpa.repository.support
 
 import jakarta.persistence.EntityManager
-import org.springframework.data.jpa.repository.query.AdvancedJpaQueryLookupStrategy
 import org.springframework.data.jpa.repository.query.EscapeCharacter
 import org.springframework.data.jpa.repository.query.JpaQueryMethodFactory
 import org.springframework.data.jpa.repository.query.QueryRewriterProvider
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory
 import org.springframework.data.repository.core.RepositoryMetadata
-import org.springframework.data.repository.query.QueryLookupStrategy
-import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider
-import java.util.*
 
 open class AdvancedJpaRepositoryFactory(
     em: EntityManager,
 ) : JpaRepositoryFactory(em) {
 
     init {
-        // TODO 记录所有受管理的实体类型,
         println(em.metamodel.entities)
     }
 
@@ -58,18 +53,5 @@ open class AdvancedJpaRepositoryFactory(
 
     override fun getRepositoryBaseClass(metadata: RepositoryMetadata): Class<*> {
         return AdvancedJpaRepository::class.java
-    }
-
-    override fun getQueryLookupStrategy(
-        key: QueryLookupStrategy.Key?,
-        evaluationContextProvider: QueryMethodEvaluationContextProvider,
-    ): Optional<QueryLookupStrategy> {
-        return Optional.of(
-            AdvancedJpaQueryLookupStrategy
-                .create(
-                    entityManager, queryMethodFactory, key, evaluationContextProvider,
-                    queryRewriterProvider, escapeCharacter
-                )
-        )
     }
 }

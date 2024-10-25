@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManagerFactory
 import nxcloud.foundation.core.data.jpa.context.EntityManagerInitializerHolder
 import nxcloud.foundation.core.data.jpa.event.SoftDeleteEventListener
 import nxcloud.foundation.core.data.jpa.interceptor.EmptyJpaSessionFactoryInterceptor
+import nxcloud.foundation.core.data.jpa.repository.support.JpaEntitySupporter
 import nxcloud.foundation.core.spring.support.context.SpringContextHelper
 import org.hibernate.engine.spi.SessionImplementor
 import org.hibernate.event.service.spi.EventListenerRegistry
@@ -45,6 +46,11 @@ class NXSpringDataJpaAutoConfiguration {
         }
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    fun jpaEntitySupporter(): JpaEntitySupporter {
+        return JpaEntitySupporter()
+    }
 
     @Bean
     @ConditionalOnMissingBean(EmptyJpaSessionFactoryInterceptor::class)
