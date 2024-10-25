@@ -14,4 +14,5 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-aop")
     testRuntimeOnly("com.h2database:h2")
     testImplementation(libs.hibernate.envers)
+    implementation(libs.jsqlparser)
 }
