@@ -1,4 +1,4 @@
-package springframework
+package springframework.child.simple
 
 import org.springframework.beans.factory.NoSuchBeanDefinitionException
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
