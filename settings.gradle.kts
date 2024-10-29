@@ -13,6 +13,7 @@ include(":core-spring-boot-starter")
 include(":core-spring-boot-starter-data-jpa")
 include(":core-event")
 include(":core-bom")
+include(":core-plugin")
 
 pluginManagement {
     repositories {
@@ -20,6 +21,9 @@ pluginManagement {
         gradlePluginPortal()
         google()
     }
+}
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
