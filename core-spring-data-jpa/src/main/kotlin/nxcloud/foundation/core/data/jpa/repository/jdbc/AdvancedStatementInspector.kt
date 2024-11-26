@@ -19,13 +19,19 @@ class AdvancedStatementInspector : StatementInspector {
     }
 
     override fun inspect(sql: String): String {
-        val parsed = CCJSqlParserUtil.parse(sql)
-        // 动态添加 deleted = 0查询条件
-        if (parsed is PlainSelect) {
-            return if (composeWithDataQueryContext(parsed)) {
-                parsed.toString()
-            } else {
-                sql
+        try {
+            val parsed = CCJSqlParserUtil.parse(sql)
+            // 动态添加 deleted = 0查询条件
+            if (parsed is PlainSelect) {
+                return if (composeWithDataQueryContext(parsed)) {
+                    parsed.toString()
+                } else {
+                    sql
+                }
+            }
+        } catch (e: Exception) {
+            logger.error(e) {
+                "解析SQL语句失败, 不做处理, 原始SQL: $sql"
             }
         }
 
