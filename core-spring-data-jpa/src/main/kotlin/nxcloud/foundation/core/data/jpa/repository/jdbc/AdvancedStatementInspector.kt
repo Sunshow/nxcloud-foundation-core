@@ -5,6 +5,7 @@ import net.sf.jsqlparser.parser.CCJSqlParserUtil
 import net.sf.jsqlparser.schema.Table
 import net.sf.jsqlparser.statement.select.PlainSelect
 import nxcloud.foundation.core.data.jpa.repository.support.JpaEntitySupporter
+import nxcloud.foundation.core.data.support.context.DataQueryContext
 import nxcloud.foundation.core.data.support.context.DataQueryContextHolder
 import nxcloud.foundation.core.data.support.enumeration.DataQueryMode
 import nxcloud.foundation.core.spring.support.context.SpringContextHelper
@@ -19,19 +20,25 @@ class AdvancedStatementInspector : StatementInspector {
     }
 
     override fun inspect(sql: String): String {
-        try {
-            val parsed = CCJSqlParserUtil.parse(sql)
-            // 动态添加 deleted = 0查询条件
-            if (parsed is PlainSelect) {
-                return if (composeWithDataQueryContext(parsed)) {
-                    parsed.toString()
-                } else {
-                    sql
+        val context = DataQueryContextHolder.currentOrElse()
+
+        if (context.enable) {
+            logger.debug { "已启用 DataQueryContext, 开始处理, context=$context" }
+
+            try {
+                val parsed = CCJSqlParserUtil.parse(sql)
+                // 动态添加 deleted = 0查询条件
+                if (parsed is PlainSelect) {
+                    return if (composeWithDataQueryContext(parsed, context)) {
+                        parsed.toString()
+                    } else {
+                        sql
+                    }
                 }
-            }
-        } catch (e: Exception) {
-            logger.error(e) {
-                "解析SQL语句失败, 不做处理, 原始SQL: $sql"
+            } catch (e: Exception) {
+                logger.error(e) {
+                    "解析SQL语句失败, 不做处理, 原始SQL: $sql"
+                }
             }
         }
 
@@ -44,7 +51,7 @@ class AdvancedStatementInspector : StatementInspector {
      * @param plainSelect 要修改的 `PlainSelect` 对象，添加额外的查询条件
      * @return 布尔值，表示是否进行了变更
      */
-    private fun composeWithDataQueryContext(plainSelect: PlainSelect): Boolean {
+    private fun composeWithDataQueryContext(plainSelect: PlainSelect, context: DataQueryContext): Boolean {
         val fromTable = plainSelect.fromItem as? Table ?: return false
 
         val tableName = fromTable.name
@@ -56,8 +63,6 @@ class AdvancedStatementInspector : StatementInspector {
         }
 
         logger.debug { "启用全局软删除处理" }
-
-        val context = DataQueryContextHolder.currentOrElse()
 
         val tableAlias = fromTable.alias?.name
             ?.takeIf {

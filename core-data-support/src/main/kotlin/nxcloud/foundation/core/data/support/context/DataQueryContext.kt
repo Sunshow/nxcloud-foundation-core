@@ -4,6 +4,10 @@ import nxcloud.foundation.core.data.support.enumeration.DataQueryMode
 
 open class DataQueryContext(
     /**
+     * 是否启用
+     */
+    val enable: Boolean = false,
+    /**
      * 查询模式
      */
     val queryMode: DataQueryMode = DataQueryMode.NotDeleted,

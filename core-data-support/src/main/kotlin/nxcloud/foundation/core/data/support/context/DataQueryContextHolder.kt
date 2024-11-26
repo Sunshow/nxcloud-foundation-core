@@ -2,7 +2,9 @@ package nxcloud.foundation.core.data.support.context
 
 object DataQueryContextHolder {
 
-    private val empty = DataQueryContext()
+    val EMPTY = DataQueryContext()
+
+    val ENABLED = DataQueryContext(enable = true)
 
     private val contextThreadLocal = ThreadLocal<DataQueryContext>()
 
@@ -27,7 +29,7 @@ object DataQueryContextHolder {
     }
 
     @JvmStatic
-    fun currentOrElse(supplier: () -> DataQueryContext = { empty }): DataQueryContext {
+    fun currentOrElse(supplier: () -> DataQueryContext = { EMPTY }): DataQueryContext {
         var context = contextThreadLocal.get()
         if (context == null) {
             synchronized(this) {
@@ -55,8 +57,11 @@ object DataQueryContextHolder {
     }
 
     @JvmStatic
-    fun reset() {
+    fun reset(enabled: Boolean = false) {
         contextThreadLocal.remove()
+        if (enabled) {
+            contextThreadLocal.set(ENABLED)
+        }
     }
 
 }
