@@ -4,6 +4,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.math.max
 
 /**
  * 身份证校验工具类
@@ -20,7 +21,7 @@ object ChinaIdCardHelper {
 
     private val yyyyMMdd: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
 
-    private val AreaCodes = mapOf(
+    private val ProvinceCodes = mapOf(
         "11" to "北京",
         "12" to "天津",
         "13" to "河北",
@@ -74,10 +75,31 @@ object ChinaIdCardHelper {
             RESULT 0 1 2 3 4 5 6 7 8 9 10
             校验码A[1] 1 0 X 9 8 7 6 5 4 3 2
      */
-    fun isValidIdCard(idCard: String): Boolean {
+    fun isValidIdCard(idCard: String, ageMin: Int = -1, ageMax: Int = -1): Boolean {
+        val idCardObj = tryParse(idCard) ?: return false
+
+        // 判断出生日期是否有效, 在当前时间之前且距离当前150年以内
+        val age = idCardObj.age
+        if (age > max(150, ageMax)) {
+            logger.error { "身份证号码格式错误，年龄超出上限" }
+            return false
+        }
+
+        if (ageMin >= 0 && age < ageMin) {
+            logger.error { "身份证号码格式错误，年龄小于最小年龄" }
+            return false
+        }
+
+        return true
+    }
+
+    /**
+     * 解析身份证号码
+     */
+    fun tryParse(idCard: String): IdCard? {
         // 号码的长度 18位
         if (idCard.length != 18) {
-            return false
+            return null
         }
 
         // 数字 除最后一位都为数字
@@ -90,7 +112,7 @@ object ChinaIdCardHelper {
             ?: run {
                 logger.error { "身份证号码格式错误，前17位必须为数字" }
 
-                return false
+                return null
             }
 
         // 最后一位必须是数字或者 X
@@ -105,13 +127,15 @@ object ChinaIdCardHelper {
             ?: run {
                 logger.error { "身份证号码格式错误，最后一位必须为数字或者 X" }
 
-                return false
+                return null
             }
 
         // 地区码是否有效
-        if (AreaCodes.containsKey(ai.substring(0, 2)).not()) {
+        val areaCode = ai.substring(0, 6)
+        val provinceCode = areaCode.substring(0, 2)
+        if (ProvinceCodes.containsKey(provinceCode).not()) {
             logger.error { "身份证号码格式错误，前两位不是有效的地区码" }
-            return false
+            return null
         }
 
         // 出生年月是否有效
@@ -123,14 +147,7 @@ object ChinaIdCardHelper {
             LocalDate.parse("$strYear$strMonth$strDay", yyyyMMdd)
         } catch (e: Exception) {
             logger.error { "身份证号码格式错误，出生日期不正确" }
-            return false
-        }
-
-        // 判断出生日期是否有效, 在当前时间之前且距离当前150年以内
-        val now = LocalDate.now()
-        if (birthDate.isAfter(now) || birthDate.isBefore(now.minusYears(150))) {
-            logger.error { "身份证号码格式错误，出生日期不正确" }
-            return false
+            return null
         }
 
         // 判断最后一位的值
@@ -141,10 +158,36 @@ object ChinaIdCardHelper {
         val modValue = aiWi % 11
         if (CheckCodes[modValue].uppercase(Locale.getDefault()) != checkCode) {
             logger.error { "身份证号码格式错误，校验位不正确" }
-            return false
+            return null
         }
 
-        return true
+        // 计算出生日期是否有效, 在当前时间之后直接报错
+        val now = LocalDate.now()
+        if (birthDate.isBefore(now).not()) {
+            logger.error { "身份证号码格式错误，出生日期不正确" }
+            return null
+        }
+
+        // 计算周岁年龄
+        var age = now.year - birthDate.year
+        if (now.minusYears(age.toLong()).isBefore(birthDate)) {
+            // 生日还没过则周岁减一
+            age--
+        }
+
+        return IdCard(
+            areaCode = areaCode,
+            province = ProvinceCodes[provinceCode]!!,
+            birthday = birthDate,
+            age = age,
+        )
     }
+
+    data class IdCard(
+        val areaCode: String,
+        val province: String,
+        val birthday: LocalDate,
+        val age: Int,
+    )
 
 }
