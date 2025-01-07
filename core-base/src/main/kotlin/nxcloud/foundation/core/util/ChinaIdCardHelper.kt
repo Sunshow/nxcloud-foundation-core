@@ -178,7 +178,9 @@ object ChinaIdCardHelper {
         return IdCard(
             areaCode = areaCode,
             province = ProvinceCodes[provinceCode]!!,
+            provinceCode = provinceCode,
             birthday = birthDate,
+            male = ai[16].digitToInt() % 2 == 1,
             age = age,
         )
     }
@@ -186,7 +188,9 @@ object ChinaIdCardHelper {
     data class IdCard(
         val areaCode: String,
         val province: String,
+        val provinceCode:String,
         val birthday: LocalDate,
+        val male: Boolean,
         val age: Int,
     )
 
