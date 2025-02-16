@@ -26,7 +26,10 @@ class AdvancedStatementInspector : StatementInspector {
             logger.debug { "已启用 DataQueryContext, 开始处理, context=$context" }
 
             try {
-                val parsed = CCJSqlParserUtil.parse(sql)
+                val parsed = CCJSqlParserUtil.parse(sql) {
+                    // 关闭复杂语法校验（适用于简单或已知正确的 SQL）
+                    it.withAllowComplexParsing(false)
+                }
                 // 动态添加 deleted = 0查询条件
                 if (parsed is PlainSelect) {
                     return if (composeWithDataQueryContext(parsed, context)) {
