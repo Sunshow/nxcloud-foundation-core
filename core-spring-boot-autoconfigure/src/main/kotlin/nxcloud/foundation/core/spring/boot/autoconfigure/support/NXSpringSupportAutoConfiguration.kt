@@ -45,7 +45,7 @@ class NXSpringSupportAutoConfiguration {
 
     // 声明一个依赖 Bean，确保 SpringContextHelperAware 提前初始化
     @Bean
-    fun contextDependencyEnforcer(springContextHelperAware: SpringContextHelperAware) = Unit
+    fun springContextHelperAwareDependencyEnforcer(springContextHelperAware: SpringContextHelperAware): Any = Any()
 
     @Bean
     @ConditionalOnMissingBean(DeployContext::class)
