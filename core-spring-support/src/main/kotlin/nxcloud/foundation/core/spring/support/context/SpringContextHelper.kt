@@ -6,6 +6,7 @@ import org.springframework.core.ResolvableType
 
 object SpringContextHelper {
 
+    @Volatile
     private lateinit var applicationContext: ApplicationContext
 
     @JvmStatic
