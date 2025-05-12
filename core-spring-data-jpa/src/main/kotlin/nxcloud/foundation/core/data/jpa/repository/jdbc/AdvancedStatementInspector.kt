@@ -2,6 +2,7 @@ package nxcloud.foundation.core.data.jpa.repository.jdbc
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.sf.jsqlparser.parser.CCJSqlParserUtil
+import net.sf.jsqlparser.parser.ParseException
 import net.sf.jsqlparser.schema.Table
 import net.sf.jsqlparser.statement.select.PlainSelect
 import nxcloud.foundation.core.data.jpa.repository.support.JpaEntitySupporter
@@ -39,8 +40,14 @@ class AdvancedStatementInspector : StatementInspector {
                     }
                 }
             } catch (e: Exception) {
-                logger.error(e) {
-                    "解析SQL语句失败, 不做处理, 原始SQL: $sql"
+                if (e is ParseException) {
+                    logger.debug {
+                        "解析SQL语句失败, 不做处理, 原始SQL: $sql, 错误信息: ${e.message}"
+                    }
+                } else {
+                    logger.error(e) {
+                        "解析SQL语句失败, 不做处理, 原始SQL: $sql"
+                    }
                 }
             }
         }

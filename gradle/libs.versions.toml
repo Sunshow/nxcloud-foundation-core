@@ -7,7 +7,7 @@ kotlin-logging-jvm = "5.1.1"
 org-modelmapper = { prefer = "3.2.0" }
 org-glassfish-jakarta-el = "5.0.0-M1"
 org-hibernate = { prefer = "6.3.1.Final" }
-jsqlparser = "5.1"
+jsqlparser = "5.2"
 org-pf4j = "3.12.1"
 
 [libraries]
