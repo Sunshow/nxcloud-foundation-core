@@ -15,6 +15,7 @@ import nxcloud.foundation.core.idgenerator.impl.snowflake.SnowFlakeIdGeneratorFa
 import nxcloud.foundation.core.spring.boot.autoconfigure.properties.WechatProperties
 import nxcloud.foundation.core.spring.support.context.SpringContextHelperAware
 import org.modelmapper.ModelMapper
+import org.modelmapper.convention.MatchingStrategies
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.AutoConfigureOrder
@@ -106,6 +107,9 @@ class NXSpringSupportAutoConfiguration {
         @ConditionalOnMissingBean
         fun modelMapper(): ModelMapper {
             return ModelMapper()
+                .apply {
+                    configuration.matchingStrategy = MatchingStrategies.STRICT
+                }
         }
 
         @Bean
