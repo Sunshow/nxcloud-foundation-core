@@ -133,7 +133,7 @@ subprojects {
 
 subprojects {
     // 发布 release
-    version = "0.8.0"
+    version = "0.8.1"
 
     if (project.name == "core-bom") {
         return@subprojects
