@@ -1,2 +1,3 @@
 nxcloud.foundation.core.spring.boot.autoconfigure.support.NXSpringSupportAutoConfiguration
 nxcloud.foundation.core.spring.boot.autoconfigure.support.NXSpringDataJpaAutoConfiguration
+nxcloud.foundation.core.spring.boot.autoconfigure.support.UniversalTaskAutoConfiguration

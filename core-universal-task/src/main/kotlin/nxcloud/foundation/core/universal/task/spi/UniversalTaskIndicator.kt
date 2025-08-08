@@ -2,6 +2,10 @@ package nxcloud.foundation.core.universal.task.spi
 
 interface UniversalTaskIndicator {
 
+    fun indicatorId(): String {
+        return this::class.java.simpleName
+    }
+
     fun getTaskList(): List<UniversalTaskInfo>
 
     fun getSupportedOperations(): Set<UniversalTaskOperation>
@@ -16,5 +20,5 @@ interface UniversalTaskIndicator {
     fun canExecuteOperation(operation: UniversalTaskOperation): Boolean {
         return getSupportedOperations().contains(operation)
     }
-    
+
 }

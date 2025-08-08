@@ -27,3 +27,5 @@ build/
 !gradle-wrapper.jar
 .gradletasknamecache
 lombok.config
+
+/.claude/

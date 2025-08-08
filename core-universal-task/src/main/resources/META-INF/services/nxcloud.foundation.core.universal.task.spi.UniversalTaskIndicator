@@ -1,0 +1,13 @@
+# Universal Task Indicator SPI Configuration
+# 
+# This file lists the service provider implementations for UniversalTaskIndicator.
+# Each line should contain the fully qualified class name of a UniversalTaskIndicator implementation.
+# 
+# Example:
+# com.example.MyUniversalTaskIndicator
+# com.example.AnotherUniversalTaskIndicator
+#
+# Implementations should:
+# 1. Implement the UniversalTaskIndicator interface
+# 2. Have a public no-argument constructor
+# 3. Be thread-safe if accessed concurrently
