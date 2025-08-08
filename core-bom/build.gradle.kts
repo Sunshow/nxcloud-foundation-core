@@ -19,6 +19,7 @@ dependencies {
         api(project(":core-spring-boot-starter"))
         api(project(":core-spring-boot-starter-data-jpa"))
         api(project(":core-event"))
+        api(project(":core-universal-task"))
     }
 }
 
