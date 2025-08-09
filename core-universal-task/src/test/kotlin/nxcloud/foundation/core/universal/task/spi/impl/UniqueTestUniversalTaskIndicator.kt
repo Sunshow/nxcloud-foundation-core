@@ -1,14 +1,14 @@
 package nxcloud.foundation.core.universal.task.spi.impl
 
+import nxcloud.foundation.core.universal.task.enumeration.UniversalTaskOperation
 import nxcloud.foundation.core.universal.task.spi.UniversalTaskIndicator
 import nxcloud.foundation.core.universal.task.spi.UniversalTaskInfo
-import nxcloud.foundation.core.universal.task.spi.UniversalTaskOperation
 import nxcloud.foundation.core.universal.task.spi.UniversalTaskOperationResult
 import java.time.LocalDateTime
 import java.util.*
 
 class UniqueTestUniversalTaskIndicator : UniversalTaskIndicator {
-    
+
     private val uniqueId = "UniqueTestIndicator-${UUID.randomUUID()}"
 
     override fun indicatorId(): String {
@@ -44,12 +44,15 @@ class UniqueTestUniversalTaskIndicator : UniversalTaskIndicator {
             UniversalTaskOperation.START -> {
                 UniversalTaskOperationResult.success("独特任务已启动")
             }
+
             UniversalTaskOperation.PAUSE -> {
                 UniversalTaskOperationResult.success("独特任务已暂停")
             }
+
             UniversalTaskOperation.STOP -> {
                 UniversalTaskOperationResult.success("独特任务已停止")
             }
+
             else -> {
                 super.executeOperation(operation) // 使用接口默认实现
             }

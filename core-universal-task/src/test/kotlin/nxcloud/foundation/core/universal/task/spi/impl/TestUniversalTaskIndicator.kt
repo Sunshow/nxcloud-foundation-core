@@ -1,8 +1,8 @@
 package nxcloud.foundation.core.universal.task.spi.impl
 
+import nxcloud.foundation.core.universal.task.enumeration.UniversalTaskOperation
 import nxcloud.foundation.core.universal.task.spi.UniversalTaskIndicator
 import nxcloud.foundation.core.universal.task.spi.UniversalTaskInfo
-import nxcloud.foundation.core.universal.task.spi.UniversalTaskOperation
 import nxcloud.foundation.core.universal.task.spi.UniversalTaskOperationResult
 import java.time.LocalDateTime
 
@@ -48,12 +48,15 @@ class TestUniversalTaskIndicator : UniversalTaskIndicator {
             UniversalTaskOperation.START -> {
                 UniversalTaskOperationResult.success("任务已启动")
             }
+
             UniversalTaskOperation.PAUSE -> {
                 UniversalTaskOperationResult.success("任务已暂停")
             }
+
             UniversalTaskOperation.STOP -> {
                 UniversalTaskOperationResult.success("任务已停止")
             }
+
             else -> {
                 super.executeOperation(operation) // 使用接口默认实现
             }

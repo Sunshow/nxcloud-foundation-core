@@ -1,6 +1,6 @@
 package nxcloud.foundation.core.universal.task.registry
 
-import nxcloud.foundation.core.universal.task.spi.UniversalTaskOperation
+import nxcloud.foundation.core.universal.task.enumeration.UniversalTaskOperation
 import nxcloud.foundation.core.universal.task.spi.impl.TestUniversalTaskIndicator
 import nxcloud.foundation.core.universal.task.spi.impl.UniqueTestUniversalTaskIndicator
 import org.junit.jupiter.api.Assertions.*

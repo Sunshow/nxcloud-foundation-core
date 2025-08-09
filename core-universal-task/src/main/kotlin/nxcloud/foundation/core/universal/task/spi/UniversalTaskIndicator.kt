@@ -1,10 +1,14 @@
 package nxcloud.foundation.core.universal.task.spi
 
+import nxcloud.foundation.core.universal.task.enumeration.UniversalTaskOperation
+
 interface UniversalTaskIndicator {
 
     fun indicatorId(): String {
         return this::class.java.simpleName
     }
+
+    fun indicatorName(): String
 
     fun getTaskList(): List<UniversalTaskInfo>
 

@@ -48,12 +48,12 @@ object UniversalTaskIndicatorRegistry {
                     if (!registeredIndicators.containsKey(indicatorName)) {
                         registeredIndicators[indicatorName] = indicator
                         logger.info {
-                            "Loaded UniversalTaskIndicator via SPI: $indicatorName"
+                            "Loaded UniversalTaskIndicator via SPI: $indicatorName, ${indicator.indicatorName()}"
                         }
                     }
                 }.onFailure {
                     logger.error(it) {
-                        "Failed to load UniversalTaskIndicator via SPI: ${indicator.javaClass.name}, error: ${it.message}"
+                        "Failed to load UniversalTaskIndicator via SPI: ${indicator.javaClass.name}, ${indicator.indicatorName()}, error: ${it.message}"
                     }
                 }
             }

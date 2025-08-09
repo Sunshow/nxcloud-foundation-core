@@ -23,29 +23,29 @@ class NXUniversalTaskAutoConfiguration(
     @EventListener(ContextRefreshedEvent::class)
     fun registerSpringUniversalTaskIndicators(event: ContextRefreshedEvent) {
         logger.info { "开始自动注册 Spring Bean 形式的 UniversalTaskIndicator" }
-        
+
         try {
             val springBeans = applicationContext.getBeansOfType(UniversalTaskIndicator::class.java)
             var successCount = 0
             var skipCount = 0
-            
+
             for ((beanName, indicator) in springBeans) {
                 try {
                     val indicatorId = indicator.indicatorId()
                     val registered = UniversalTaskIndicatorRegistry.register(indicator)
-                    
+
                     if (registered) {
-                        logger.info { "已注册 Spring Bean UniversalTaskIndicator: $beanName (ID: $indicatorId)" }
+                        logger.info { "已注册 Spring Bean UniversalTaskIndicator: $beanName ($indicatorId, ${indicator.indicatorName()})" }
                         successCount++
                     } else {
-                        logger.warn { "Spring Bean UniversalTaskIndicator 已存在，跳过注册: $beanName (ID: $indicatorId)" }
+                        logger.warn { "Spring Bean UniversalTaskIndicator 已存在，跳过注册: $beanName ($indicatorId, ${indicator.indicatorName()})" }
                         skipCount++
                     }
                 } catch (e: Exception) {
                     logger.error(e) { "注册 Spring Bean UniversalTaskIndicator 失败: $beanName, 错误: ${e.message}" }
                 }
             }
-            
+
             logger.info { "Spring Bean UniversalTaskIndicator 注册完成 - 成功: $successCount, 跳过: $skipCount, 总数: ${springBeans.size}" }
         } catch (e: Exception) {
             logger.error(e) { "自动注册 Spring Bean UniversalTaskIndicator 过程中发生异常: ${e.message}" }
