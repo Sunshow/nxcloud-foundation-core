@@ -109,6 +109,8 @@ class NXSpringSupportAutoConfiguration {
             return ModelMapper()
                 .apply {
                     configuration.matchingStrategy = MatchingStrategies.STRICT
+                    configuration.isFieldMatchingEnabled = true
+                    configuration.fieldAccessLevel = org.modelmapper.config.Configuration.AccessLevel.PRIVATE
                 }
         }
 
