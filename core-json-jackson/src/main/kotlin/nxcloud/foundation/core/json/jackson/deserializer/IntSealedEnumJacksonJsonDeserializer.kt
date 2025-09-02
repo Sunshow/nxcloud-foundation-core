@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import io.github.oshai.kotlinlogging.KotlinLogging
 import nxcloud.foundation.core.lang.enumeration.IntSealedEnum
 
-class IntSealedEnumJacksonJsonDeserializer<T : IntSealedEnum>(
+open class IntSealedEnumJacksonJsonDeserializer<T : IntSealedEnum>(
     private val enumType: Class<T>
 ) : JsonDeserializer<T>() {
 
