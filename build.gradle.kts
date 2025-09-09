@@ -26,7 +26,7 @@ allprojects {
         resolutionStrategy.cacheChangingModulesFor(0, "seconds")
     }
 
-    tasks.create("downloadDependencies") {
+    tasks.register<Task>("downloadDependencies") {
         description = "Download all dependencies to the Gradle cache"
         doLast {
             for (configuration in configurations) {
@@ -133,7 +133,7 @@ subprojects {
 
 subprojects {
     // 发布 release
-    version = "0.8.3"
+    version = "0.8.4"
 
     if (project.name == "core-bom") {
         return@subprojects
