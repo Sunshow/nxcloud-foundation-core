@@ -5,6 +5,10 @@ object TreeHelper {
     /**
      * 构建树
      */
+    @Deprecated(
+        message = "Use TreeBuilder.buildTree instead",
+        replaceWith = ReplaceWith("TreeBuilder.buildTree(list, id, parentId, isTop, setChildren, sort)")
+    )
     @JvmStatic
     fun <T, ID> buildTree(
         list: List<T>,
@@ -53,6 +57,10 @@ object TreeHelper {
         return tree.toList()
     }
 
+    @Deprecated(
+        message = "Use TreeBuilder.buildTree instead",
+        replaceWith = ReplaceWith("TreeBuilder.buildTree(list, id, parentId, setChildren, sort)")
+    )
     @JvmStatic
     fun <T> buildTree(
         list: List<T>,
