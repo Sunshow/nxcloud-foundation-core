@@ -19,7 +19,7 @@ internal class TreeBuilderAPIDemo {
         val result1 = TreeBuilder.build<TestItem, String>(items) {
             id { it.id }
             parentId { it.parentId }
-            isTop { it.isEmpty() }
+            isTop { it.parentId.isEmpty() }
             sortBy { it.sortValue }
         }
 
@@ -48,7 +48,7 @@ internal class TreeBuilderAPIDemo {
         val result = items.toTree<TestItem, String> {
             id { it.id }
             parentId { it.parentId }
-            isTop { it.isEmpty() }
+            isTop { it.parentId.isEmpty() }
             sortBy { it.sortValue }
         }
 

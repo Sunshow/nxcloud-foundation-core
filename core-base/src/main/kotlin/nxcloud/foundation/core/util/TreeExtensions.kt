@@ -53,7 +53,7 @@ object TreeExtensions {
         parentId: (T) -> String,
         comparator: Comparator<in T> = Comparator { _, _ -> 0 }
     ): List<TreeNode<T>> {
-        return TreeBuilder.buildTreeNodes(this, id, parentId, { it.isEmpty() }, comparator)
+        return TreeBuilder.buildTreeNodes(this, id, parentId, { parentId(it).isEmpty() }, comparator)
     }
 
     /**
@@ -64,6 +64,6 @@ object TreeExtensions {
         parentId: (T) -> Long,
         comparator: Comparator<in T> = Comparator { _, _ -> 0 }
     ): List<TreeNode<T>> {
-        return TreeBuilder.buildTreeNodes(this, id, parentId, { it == 0L }, comparator)
+        return TreeBuilder.buildTreeNodes(this, id, parentId, { parentId(it) == 0L }, comparator)
     }
 }

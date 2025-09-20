@@ -18,7 +18,7 @@ internal class TreeHelperBasicTest {
             data,
             { it.id },
             { it.parentId },
-            { it.isEmpty() },
+            { it.parentId.isEmpty() },
             Comparator.comparing { it.sortValue }
         )
 

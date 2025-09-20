@@ -11,7 +11,7 @@ import java.util.Comparator
 class TreeBuilder<T, ID> {
     private var idSelector: ((T) -> ID)? = null
     private var parentIdSelector: ((T) -> ID)? = null
-    private var isTopPredicate: ((ID) -> Boolean)? = null
+    private var isTopPredicate: ((T) -> Boolean)? = null
     private var comparator: Comparator<in T>? = null
     private var childrenSetter: ((T, List<T>) -> Unit)? = null
 
@@ -32,7 +32,7 @@ class TreeBuilder<T, ID> {
     /**
      * 设置顶层判断条件
      */
-    fun isTop(predicate: (ID) -> Boolean) {
+    fun isTop(predicate: (T) -> Boolean) {
         this.isTopPredicate = predicate
     }
 
@@ -91,7 +91,7 @@ class TreeBuilder<T, ID> {
             list: List<T>,
             id: (T) -> ID,
             parentId: (T) -> ID,
-            isTop: (ID) -> Boolean,
+            isTop: (T) -> Boolean,
             setChildren: (T, List<T>) -> Unit,
             sort: Comparator<in T>,
         ): List<T> {
@@ -103,7 +103,7 @@ class TreeBuilder<T, ID> {
 
             sorted.forEach {
                 val parent = parentId(it)
-                if (isTop(parent)) {
+                if (isTop(it)) {
                     // 如果是顶层 加入顶层节点
                     tree.add(it)
                 } else {
@@ -138,7 +138,7 @@ class TreeBuilder<T, ID> {
             setChildren: (T, List<T>) -> Unit,
             sort: Comparator<in T>,
         ): List<T> {
-            return buildTree(list, id, parentId, { it == 0L }, setChildren, sort)
+            return buildTree(list, id, parentId, { parentId(it) == 0L }, setChildren, sort)
         }
 
         /**
@@ -161,7 +161,7 @@ class TreeBuilder<T, ID> {
             list: List<T>,
             id: (T) -> ID,
             parentId: (T) -> ID,
-            isTop: (ID) -> Boolean,
+            isTop: (T) -> Boolean,
             sort: Comparator<in T>,
         ): List<TreeNode<T>> {
             // 先排序
@@ -173,7 +173,7 @@ class TreeBuilder<T, ID> {
             // 构建父子关系
             sorted.forEach { item ->
                 val parent = parentId(item)
-                if (isTop(parent)) {
+                if (isTop(item)) {
                     roots.add(item)
                 } else {
                     map[parent]?.let {
@@ -202,7 +202,7 @@ class TreeBuilder<T, ID> {
             parentId: (T) -> Long,
             sort: Comparator<in T>,
         ): List<TreeNode<T>> {
-            return buildTreeNodes(list, id, parentId, { it == 0L }, sort)
+            return buildTreeNodes(list, id, parentId, { parentId(it) == 0L }, sort)
         }
 
         /**
@@ -216,7 +216,7 @@ class TreeBuilder<T, ID> {
             parentId: (T) -> String,
             sort: Comparator<in T>,
         ): List<TreeNode<T>> {
-            return buildTreeNodes(list, id, parentId, { it.isEmpty() }, sort)
+            return buildTreeNodes(list, id, parentId, { parentId(it).isEmpty() }, sort)
         }
         /**
          * DSL 风格的树构建方法
@@ -241,7 +241,7 @@ class TreeBuilder<T, ID> {
             return build<T, Long>(list) {
                 id(id)
                 parentId(parentId)
-                isTop { it == 0L }
+                isTop { parentId(it) == 0L }
                 if (sortBy != null) {
                     @Suppress("UNCHECKED_CAST")
                     sortBy(sortBy as (T) -> Comparable<Any>)
@@ -262,7 +262,7 @@ class TreeBuilder<T, ID> {
             return build<T, String>(list) {
                 id(id)
                 parentId(parentId)
-                isTop { it.isEmpty() }
+                isTop { parentId(it).isEmpty() }
                 if (sortBy != null) {
                     @Suppress("UNCHECKED_CAST")
                     sortBy(sortBy as (T) -> Comparable<Any>)
@@ -280,7 +280,7 @@ class TreeBuilder<T, ID> {
             parentId: (T) -> String,
             comparator: Comparator<in T> = Comparator { _, _ -> 0 }
         ): List<TreeNode<T>> {
-            return buildTreeNodes(list, id, parentId, { it.isEmpty() }, comparator)
+            return buildTreeNodes(list, id, parentId, { parentId(it).isEmpty() }, comparator)
         }
 
         /**
@@ -293,7 +293,7 @@ class TreeBuilder<T, ID> {
             parentId: (T) -> Long,
             comparator: Comparator<in T> = Comparator { _, _ -> 0 }
         ): List<TreeNode<T>> {
-            return buildTreeNodes(list, id, parentId, { it == 0L }, comparator)
+            return buildTreeNodes(list, id, parentId, { parentId(it) == 0L }, comparator)
         }
     }
 }

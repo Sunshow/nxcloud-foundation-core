@@ -25,7 +25,7 @@ internal class TreeNodeTestSimple {
             items,
             { item -> item.id },
             { item -> item.parentId },
-            { parentId -> parentId.isEmpty() },
+            { item -> item.parentId.isEmpty() },
             Comparator.comparing { item -> item.sortValue }
         )
 

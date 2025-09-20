@@ -18,7 +18,7 @@ internal class TreeBuilderNativeTest {
         val result = TreeBuilder.buildNative<MutableTestItem, String>(items) {
             id { it.id }
             parentId { it.parentId }
-            isTop { it.isEmpty() }
+            isTop { it.parentId.isEmpty() }
             sortBy { it.sortValue }
             setChildren { item, children -> item.children = children }
         }
@@ -47,7 +47,7 @@ internal class TreeBuilderNativeTest {
         val builder = TreeBuilder<MutableTestItem, String>()
         builder.id { it.id }
         builder.parentId { it.parentId }
-        builder.isTop { it.isEmpty() }
+        builder.isTop { it.parentId.isEmpty() }
         builder.sortBy(Comparator.comparing { it.sortValue })
         builder.setChildren { item, children -> item.children = children }
 
@@ -76,7 +76,7 @@ internal class TreeBuilderNativeTest {
             items,
             { it.id },
             { it.parentId },
-            { it.isEmpty() },
+            { it.parentId.isEmpty() },
             { item, children -> item.children = children },
             Comparator.comparing { it.sortValue }
         )
