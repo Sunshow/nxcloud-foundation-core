@@ -1,5 +1,4 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     `java-library`
@@ -15,7 +14,7 @@ plugins {
 
 allprojects {
     group = "net.sunshow.nxcloud"
-    version = "0.6.0-SNAPSHOT"
+    version = "0.8.0-SNAPSHOT"
 
     repositories {
         mavenCentral()
@@ -59,6 +58,16 @@ subprojects {
     apply(plugin = "org.jetbrains.kotlin.plugin.lombok")
     apply(plugin = "io.freefair.lombok")
 
+    kotlin {
+        jvmToolchain(17)
+    }
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
+    }
+
     allOpen {
         annotations(
             "jakarta.persistence.Entity",
@@ -78,33 +87,11 @@ subprojects {
         options.encoding = Charsets.UTF_8.toString()
     }
 
-    configure<JavaPluginExtension> {
-        toolchain {
-            languageVersion.set(JavaLanguageVersion.of(17))
-        }
-    }
-
-    tasks.withType<KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = JavaVersion.VERSION_17.toString()
-            freeCompilerArgs = listOf(
-                "-Xjvm-default=all",
-            )
-        }
-    }
-
-    val testJavaVersion = System.getProperty("test.java.version", "17").toInt()
-
     tasks.withType<Test> {
         useJUnitPlatform()
         jvmArgs = jvmArgs!! + listOf(
             "-XX:+HeapDumpOnOutOfMemoryError"
         )
-
-        val javaToolchains = project.extensions.getByType<JavaToolchainService>()
-        javaLauncher.set(javaToolchains.launcherFor {
-            languageVersion.set(JavaLanguageVersion.of(testJavaVersion))
-        })
 
         maxParallelForks = Runtime.getRuntime().availableProcessors() * 2
         testLogging {
@@ -112,11 +99,6 @@ subprojects {
         }
 
         systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
-    }
-
-    tasks.withType<JavaCompile> {
-        sourceCompatibility = JavaVersion.VERSION_17.toString()
-        targetCompatibility = JavaVersion.VERSION_17.toString()
     }
 
     dependencies {
