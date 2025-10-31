@@ -1,6 +1,6 @@
 plugins {
     `java-platform`
-    `signing`
+    signing
     `maven-publish`
 }
 
