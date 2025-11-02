@@ -1,7 +1,6 @@
 [versions]
 org-jetbrains-kotlin = "2.0.21"
 org-springframework-boot = { prefer = "3.2.0" }
-io-freefair-lombok = "8.4"
 jakarta-persistence = "3.1.0"
 kotlin-logging-jvm = "7.0.13"
 org-modelmapper = { prefer = "3.2.0" }
@@ -27,6 +26,4 @@ pf4j = { module = "org.pf4j:pf4j", version.ref = "org-pf4j" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "org-jetbrains-kotlin" }
 kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "org-jetbrains-kotlin" }
 kotlin-noarg = { id = "org.jetbrains.kotlin.plugin.noarg", version.ref = "org-jetbrains-kotlin" }
-kotlin-lombok = { id = "org.jetbrains.kotlin.plugin.lombok", version.ref = "org-jetbrains-kotlin" }
-freefair-lombok = { id = "io.freefair.lombok", version.ref = "io-freefair-lombok" }
 springboot = { id = "org.springframework.boot", version.ref = "org-springframework-boot" }

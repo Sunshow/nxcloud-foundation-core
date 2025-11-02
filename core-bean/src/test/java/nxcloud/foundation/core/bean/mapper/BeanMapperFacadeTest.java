@@ -1,7 +1,5 @@
 package nxcloud.foundation.core.bean.mapper;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import nxcloud.foundation.core.bean.mapper.impl.modelmapper.ModelMapperBeanMapperFacadeImpl;
 import nxcloud.foundation.core.lang.enumeration.YesNoStatus;
 import org.junit.jupiter.api.Test;
@@ -37,7 +35,6 @@ public class BeanMapperFacadeTest {
 
 }
 
-@Data
 class Source {
     private String name;
     private int age;
@@ -50,10 +47,40 @@ class Source {
         this.name = name;
         this.age = age;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public YesNoStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(YesNoStatus status) {
+        this.status = status;
+    }
+
+    public List<String> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<String> children) {
+        this.children = children;
+    }
 }
 
-@NoArgsConstructor
-@Data
 class Dest {
     private String name;
     private int age;
@@ -62,8 +89,43 @@ class Dest {
 
     private List<String> children;
 
+    public Dest() {
+    }
+
     public Dest(String name, int age) {
         this.name = name;
         this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public YesNoStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(YesNoStatus status) {
+        this.status = status;
+    }
+
+    public List<String> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<String> children) {
+        this.children = children;
     }
 }

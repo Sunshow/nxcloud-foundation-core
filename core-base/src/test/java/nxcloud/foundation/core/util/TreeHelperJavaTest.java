@@ -1,7 +1,5 @@
 package nxcloud.foundation.core.util;
 
-import lombok.Data;
-import lombok.ToString;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -17,7 +15,7 @@ public class TreeHelperJavaTest {
                 treeData(),
                 TreeNode::getId,
                 TreeNode::getParentId,
-                pid -> pid.equals(""),
+                pid -> pid.isEmpty(),
                 (node, children) -> {
                     node.setChildren((List<TreeNode>) children);
                     return null;
@@ -42,8 +40,6 @@ public class TreeHelperJavaTest {
         return data;
     }
 
-    @ToString
-    @Data
     static public class TreeNode {
         private String id;
 
@@ -62,5 +58,44 @@ public class TreeHelperJavaTest {
             this.sortValue = sortValue;
         }
 
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getParentId() {
+            return parentId;
+        }
+
+        public void setParentId(String parentId) {
+            this.parentId = parentId;
+        }
+
+        public Integer getSortValue() {
+            return sortValue;
+        }
+
+        public void setSortValue(Integer sortValue) {
+            this.sortValue = sortValue;
+        }
+
+        public List<TreeNode> getChildren() {
+            return children;
+        }
+
+        public void setChildren(List<TreeNode> children) {
+            this.children = children;
+        }
     }
 }

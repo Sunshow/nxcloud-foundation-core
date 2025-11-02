@@ -7,8 +7,6 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.allopen)
     alias(libs.plugins.kotlin.noarg)
-    alias(libs.plugins.kotlin.lombok) apply false
-    alias(libs.plugins.freefair.lombok) apply false
     // alias(libs.plugins.springboot) apply false
 }
 
@@ -55,8 +53,6 @@ subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "org.jetbrains.kotlin.plugin.allopen")
     apply(plugin = "org.jetbrains.kotlin.plugin.noarg")
-    apply(plugin = "org.jetbrains.kotlin.plugin.lombok")
-    apply(plugin = "io.freefair.lombok")
 
     kotlin {
         jvmToolchain(17)
