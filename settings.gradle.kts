@@ -15,6 +15,8 @@ include(":core-event")
 include(":core-universal-task")
 include(":core-bom")
 include(":core-plugin")
+include(":core-assembler-annotation")
+include(":core-assembler")
 
 pluginManagement {
     repositories {

@@ -20,6 +20,8 @@ dependencies {
         api(project(":core-spring-boot-starter-data-jpa"))
         api(project(":core-event"))
         api(project(":core-universal-task"))
+        api(project(":core-assembler-annotation"))
+        api(project(":core-assembler"))
     }
 }
 

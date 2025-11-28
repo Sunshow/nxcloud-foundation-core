@@ -8,6 +8,7 @@ org-glassfish-jakarta-el = "5.0.0-M1"
 org-hibernate = { prefer = "6.3.1.Final" }
 jsqlparser = "5.2"
 org-pf4j = "3.12.1"
+commons-beanutils = { prefer = "1.11.0" }
 
 [libraries]
 javax-jaxb = { module = "javax.xml.bind:jaxb-api", version = "2.3.1" }
@@ -21,6 +22,7 @@ jakarta-el = { module = "org.glassfish:jakarta.el", version.ref = "org-glassfish
 hibernate-envers = { module = "org.hibernate:hibernate-envers", version.ref = "org-hibernate" }
 jsqlparser = { module = "com.github.jsqlparser:jsqlparser", version.ref = "jsqlparser" }
 pf4j = { module = "org.pf4j:pf4j", version.ref = "org-pf4j" }
+commons-beanutils = { module = "commons-beanutils:commons-beanutils", version.ref = "commons-beanutils" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "org-jetbrains-kotlin" }
