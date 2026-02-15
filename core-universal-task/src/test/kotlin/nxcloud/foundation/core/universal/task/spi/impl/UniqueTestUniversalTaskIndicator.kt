@@ -11,6 +11,8 @@ class UniqueTestUniversalTaskIndicator : UniversalTaskIndicator {
 
     private val uniqueId = "UniqueTestIndicator-${UUID.randomUUID()}"
 
+    override fun indicatorName(): String = "独特测试任务指示器"
+
     override fun indicatorId(): String {
         return uniqueId
     }

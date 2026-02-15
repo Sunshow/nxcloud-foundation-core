@@ -14,6 +14,8 @@ class SpringTestUniversalTaskIndicator : UniversalTaskIndicator {
         return "springTestUniversalTaskIndicator"
     }
 
+    override fun indicatorName(): String = "Spring测试任务指示器"
+
     override fun getTaskList(): List<UniversalTaskInfo> {
         return listOf(
             UniversalTaskInfo(
@@ -35,7 +37,7 @@ class SpringTestUniversalTaskIndicator : UniversalTaskIndicator {
             UniversalTaskOperation.START,
             UniversalTaskOperation.PAUSE,
             UniversalTaskOperation.STOP,
-            UniversalTaskOperation.RESTART
+            UniversalTaskOperation.RESET
         )
     }
 
@@ -53,8 +55,8 @@ class SpringTestUniversalTaskIndicator : UniversalTaskIndicator {
                 UniversalTaskOperationResult.success("Spring任务已停止")
             }
 
-            UniversalTaskOperation.RESTART -> {
-                UniversalTaskOperationResult.success("Spring任务已重启")
+            UniversalTaskOperation.RESET -> {
+                UniversalTaskOperationResult.success("Spring任务已重置")
             }
 
             else -> {

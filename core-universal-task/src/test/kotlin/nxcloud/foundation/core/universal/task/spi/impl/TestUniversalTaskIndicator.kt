@@ -8,6 +8,8 @@ import java.time.LocalDateTime
 
 class TestUniversalTaskIndicator : UniversalTaskIndicator {
 
+    override fun indicatorName(): String = "测试任务指示器"
+
     override fun getTaskList(): List<UniversalTaskInfo> {
         return listOf(
             UniversalTaskInfo(
