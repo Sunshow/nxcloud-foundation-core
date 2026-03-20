@@ -29,7 +29,10 @@ import kotlin.reflect.jvm.kotlinProperty
  * ## 3. 正向批量加载（@AssemblyBatchField）
  * 从主实体的 ID 列表字段批量加载目标实体列表
  *
- * ## 4. 嵌套装配
+ * ## 4. 一对一反向关联（@AssemblyReverseField）
+ * 反向查询单个子实体，子实体中需标记指向主实体的外键，可提取子实体的特定属性
+ *
+ * ## 5. 嵌套装配
  * 列表元素类型也可以是 @AssemblableWrapper，会自动递归装配
  */
 class AssemblableWrapperAssembler {
@@ -42,6 +45,7 @@ class AssemblableWrapperAssembler {
         val fields: Map<String, FieldMetadata>,
         val listFields: Map<String, ListFieldMetadata> = emptyMap(),
         val batchFields: Map<String, BatchFieldMetadata> = emptyMap(),
+        val reverseFields: Map<String, ReverseFieldMetadata> = emptyMap(),
     )
 
     data class EntityMetadata(
@@ -71,6 +75,13 @@ class AssemblableWrapperAssembler {
         val property: KProperty1<*, *>,
         val elementClass: KClass<*>,
         val sourceField: RefSourceFieldMetadata,
+    )
+
+    data class ReverseFieldMetadata(
+        val annotation: AssemblyReverseField,
+        val property: KProperty1<*, *>,
+        val targetClass: KClass<*>,
+        val refSourceField: RefSourceFieldMetadata,
     )
 
     data class RefSourceMetadata(
@@ -139,6 +150,11 @@ class AssemblableWrapperAssembler {
 
     data class BatchListLoadResult(
         val loadedData: Map<ListRefSourceKey, Map<Any, List<Any>>>
+    )
+
+    data class ReverseRefSourceKey(
+        val targetClass: KClass<*>,
+        val targetFieldName: String,
     )
 
     // ==================== 元数据解析 ====================
@@ -309,12 +325,48 @@ class AssemblableWrapperAssembler {
                 }
                 .toMap()
 
+            // 解析 @AssemblyReverseField 注解
+            val reverseFieldMetadataMap = wrapperClass.memberProperties
+                .mapNotNull { property ->
+                    val reverseFieldAnnotation = property.javaField?.getAnnotation(AssemblyReverseField::class.java)
+                    if (reverseFieldAnnotation != null) {
+                        val targetClass = reverseFieldAnnotation.target
+                        val targetRefSourceMetadata = resolveRefSourceMetadata(targetClass)
+
+                        val refSourceFieldMetadata = if (reverseFieldAnnotation.targetField.isNotEmpty()) {
+                            targetRefSourceMetadata.fields[reverseFieldAnnotation.targetField]
+                                ?: throw IllegalArgumentException(
+                                    "在 ${targetClass.simpleName} 中未找到字段 '${reverseFieldAnnotation.targetField}' 的 @AssemblyRefSource 注解"
+                                )
+                        } else {
+                            targetRefSourceMetadata.fields.values
+                                .filter { it.sourceClass == entityMetadata.entityClass }
+                                .takeIf { it.size == 1 }
+                                ?.firstOrNull()
+                                ?: throw IllegalArgumentException(
+                                    "在 ${targetClass.simpleName} 中未找到指向 ${entityMetadata.entityClass.simpleName} 的唯一 @AssemblyRefSource 字段"
+                                )
+                        }
+
+                        property.name to ReverseFieldMetadata(
+                            annotation = reverseFieldAnnotation,
+                            property = property,
+                            targetClass = targetClass,
+                            refSourceField = refSourceFieldMetadata,
+                        )
+                    } else {
+                        null
+                    }
+                }
+                .toMap()
+
             WrapperMetadata(
                 annotation = wrapperAnnotation,
                 entity = entityMetadata,
                 fields = fieldMetadataMap,
                 listFields = listFieldMetadataMap,
                 batchFields = batchFieldMetadataMap,
+                reverseFields = reverseFieldMetadataMap,
             )
         }
     }
@@ -411,6 +463,42 @@ class AssemblableWrapperAssembler {
             }
         }
 
+        // 处理 @AssemblyReverseField 字段
+        if (dataProvider is BatchListRefSourceDataProvider && wrapperMetadata.reverseFields.isNotEmpty()) {
+            val reverseLoadCache = mutableMapOf<ReverseRefSourceKey, Any?>()
+
+            wrapperMetadata.reverseFields.forEach { (_, reverseFieldMetadata) ->
+                val sourceFieldName = reverseFieldMetadata.refSourceField.sourceFieldName.ifEmpty { "id" }
+                val sourceFieldValue = PropertyUtils.getProperty(sourceEntity, sourceFieldName)
+
+                if (sourceFieldValue != null) {
+                    val key = ReverseRefSourceKey(
+                        targetClass = reverseFieldMetadata.targetClass,
+                        targetFieldName = reverseFieldMetadata.refSourceField.property.name,
+                    )
+
+                    val reverseEntity = reverseLoadCache.getOrPut(key) {
+                        @Suppress("UNCHECKED_CAST")
+                        val result = dataProvider.loadListBatch(
+                            target = reverseFieldMetadata.targetClass as KClass<Any>,
+                            targetFieldName = reverseFieldMetadata.refSourceField.property.name,
+                            sourceFieldValues = setOf(sourceFieldValue)
+                        )
+                        result[sourceFieldValue]?.firstOrNull()
+                    }
+
+                    if (reverseEntity != null) {
+                        val valueToSet = if (reverseFieldMetadata.annotation.sourceProperty.isNotEmpty()) {
+                            PropertyUtils.getProperty(reverseEntity, reverseFieldMetadata.annotation.sourceProperty)
+                        } else {
+                            reverseEntity
+                        }
+                        PropertyUtils.setProperty(wrapper, reverseFieldMetadata.property.name, valueToSet)
+                    }
+                }
+            }
+        }
+
         return wrapper
     }
 
@@ -431,6 +519,11 @@ class AssemblableWrapperAssembler {
             val listRequest = collectListLoadRequests(result)
             val listLoadResult = batchListLoad(listRequest, dataProvider)
             distributeAndFillList(result, listLoadResult, dataProvider)
+
+            // 阶段5: 处理 @AssemblyReverseField（一对一反向关联）
+            val reverseRequest = collectReverseLoadRequests(result)
+            val reverseLoadResult = batchReverseLoad(reverseRequest, dataProvider)
+            distributeAndFillReverse(result, reverseLoadResult)
         }
 
         return result
@@ -587,6 +680,107 @@ class AssemblableWrapperAssembler {
         }
 
         return wrappers
+    }
+
+    // ==================== 一对一反向关联处理（@AssemblyReverseField）====================
+
+    private fun <T : Any> collectReverseLoadRequests(wrappers: List<T>): BatchListAssemblyRequest {
+        val loadRequests = mutableMapOf<ListRefSourceKey, MutableSet<Any>>()
+
+        wrappers.forEach { wrapper ->
+            val wrapperClass = wrapper::class
+            val wrapperMetadata = resolveWrapperMetadata(wrapperClass)
+            val entityMetadata = wrapperMetadata.entity
+
+            if (wrapperMetadata.reverseFields.isEmpty()) return@forEach
+
+            val sourceEntity: Any = if (entityMetadata.isInheritanceMode) {
+                wrapper
+            } else {
+                PropertyUtils.getProperty(wrapper, entityMetadata.property!!.name)
+                    ?: return@forEach
+            }
+
+            wrapperMetadata.reverseFields.forEach { (_, reverseFieldMetadata) ->
+                val sourceFieldName = reverseFieldMetadata.refSourceField.sourceFieldName.ifEmpty { "id" }
+                val sourceFieldValue = PropertyUtils.getProperty(sourceEntity, sourceFieldName)
+
+                if (sourceFieldValue != null) {
+                    val key = ListRefSourceKey(
+                        targetClass = reverseFieldMetadata.targetClass,
+                        targetFieldName = reverseFieldMetadata.refSourceField.property.name,
+                    )
+                    loadRequests
+                        .getOrPut(key) { mutableSetOf() }
+                        .add(sourceFieldValue)
+                }
+            }
+        }
+
+        return BatchListAssemblyRequest(loadRequests)
+    }
+
+    private fun batchReverseLoad(
+        request: BatchListAssemblyRequest,
+        dataProvider: BatchListRefSourceDataProvider
+    ): BatchListLoadResult {
+        val loadedData = mutableMapOf<ListRefSourceKey, Map<Any, List<Any>>>()
+
+        request.loadRequests.forEach { (key, values) ->
+            if (values.isNotEmpty()) {
+                @Suppress("UNCHECKED_CAST")
+                val result = dataProvider.loadListBatch(
+                    target = key.targetClass as KClass<Any>,
+                    targetFieldName = key.targetFieldName,
+                    sourceFieldValues = values
+                )
+                loadedData[key] = result
+            }
+        }
+
+        return BatchListLoadResult(loadedData)
+    }
+
+    private fun <T : Any> distributeAndFillReverse(
+        wrappers: List<T>,
+        loadResult: BatchListLoadResult,
+    ) {
+        wrappers.forEach { wrapper ->
+            val wrapperClass = wrapper::class
+            val wrapperMetadata = resolveWrapperMetadata(wrapperClass)
+            val entityMetadata = wrapperMetadata.entity
+
+            if (wrapperMetadata.reverseFields.isEmpty()) return@forEach
+
+            val sourceEntity: Any = if (entityMetadata.isInheritanceMode) {
+                wrapper
+            } else {
+                PropertyUtils.getProperty(wrapper, entityMetadata.property!!.name)
+                    ?: return@forEach
+            }
+
+            wrapperMetadata.reverseFields.forEach { (_, reverseFieldMetadata) ->
+                val sourceFieldName = reverseFieldMetadata.refSourceField.sourceFieldName.ifEmpty { "id" }
+                val sourceFieldValue = PropertyUtils.getProperty(sourceEntity, sourceFieldName)
+
+                if (sourceFieldValue != null) {
+                    val key = ListRefSourceKey(
+                        targetClass = reverseFieldMetadata.targetClass,
+                        targetFieldName = reverseFieldMetadata.refSourceField.property.name,
+                    )
+
+                    val reverseEntity = loadResult.loadedData[key]?.get(sourceFieldValue)?.firstOrNull()
+                    if (reverseEntity != null) {
+                        val valueToSet = if (reverseFieldMetadata.annotation.sourceProperty.isNotEmpty()) {
+                            PropertyUtils.getProperty(reverseEntity, reverseFieldMetadata.annotation.sourceProperty)
+                        } else {
+                            reverseEntity
+                        }
+                        PropertyUtils.setProperty(wrapper, reverseFieldMetadata.property.name, valueToSet)
+                    }
+                }
+            }
+        }
     }
 
     // ==================== 一对多关联处理（@AssemblyListField）====================

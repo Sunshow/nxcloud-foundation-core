@@ -545,6 +545,128 @@ class AssemblableWrapperTest {
         assertEquals(1, assembled.size, "应返回1个 Wrapper")
     }
 
+    @Test
+    fun testAssembleReverseField() {
+        val account = MerchantAccountEntity(
+            id = 1L,
+            balance = java.math.BigDecimal("100.50"),
+            totalRecharge = java.math.BigDecimal("500.00"),
+            totalConsume = java.math.BigDecimal("399.50"),
+            merchantId = 100L,
+        )
+
+        val wrapper = MerchantWithAccountWrapperEntity(id = 100L, name = "测试商户")
+
+        val assembler = AssemblableWrapperAssembler()
+        val assembled = assembler.assemble(
+            wrapper,
+            object : AssemblableWrapperAssembler.RefSourceDataProvider,
+                AssemblableWrapperAssembler.BatchListRefSourceDataProvider {
+                override fun <T : Any> load(
+                    source: KClass<T>,
+                    metadata: AssemblableWrapperAssembler.RefSourceFieldMetadata,
+                    sourceFieldValue: Any?
+                ): T? = null
+
+                override fun <T : Any> loadListBatch(
+                    target: KClass<T>,
+                    targetFieldName: String,
+                    sourceFieldValues: Set<Any>
+                ): Map<Any, List<T>> {
+                    assertEquals("merchantId", targetFieldName)
+                    @Suppress("UNCHECKED_CAST")
+                    return mapOf(100L to listOf(account)) as Map<Any, List<T>>
+                }
+
+                override fun <S : Any, T : Any> mapList(source: List<S>, targetClass: KClass<T>): List<T> {
+                    @Suppress("UNCHECKED_CAST")
+                    return source as List<T>
+                }
+            }
+        )
+
+        assertEquals(java.math.BigDecimal("100.50"), assembled.balance, "balance 应匹配")
+        assertEquals(java.math.BigDecimal("500.00"), assembled.totalRecharge, "totalRecharge 应匹配")
+        assertEquals(java.math.BigDecimal("399.50"), assembled.totalConsume, "totalConsume 应匹配")
+        assertNotNull(assembled.account, "account 应被填充")
+        assertEquals(1L, assembled.account?.id, "account.id 应匹配")
+    }
+
+    @Test
+    fun testAssembleReverseFieldBatch() {
+        val account1 = MerchantAccountEntity(
+            id = 1L,
+            balance = java.math.BigDecimal("100.50"),
+            totalRecharge = java.math.BigDecimal("500.00"),
+            totalConsume = java.math.BigDecimal("399.50"),
+            merchantId = 100L,
+        )
+        val account2 = MerchantAccountEntity(
+            id = 2L,
+            balance = java.math.BigDecimal("200.00"),
+            totalRecharge = java.math.BigDecimal("800.00"),
+            totalConsume = java.math.BigDecimal("600.00"),
+            merchantId = 200L,
+        )
+
+        val wrappers = listOf(
+            MerchantWithAccountWrapperEntity(id = 100L, name = "商户1"),
+            MerchantWithAccountWrapperEntity(id = 200L, name = "商户2"),
+            MerchantWithAccountWrapperEntity(id = 300L, name = "商户3"),
+        )
+
+        var listBatchLoadCallCount = 0
+
+        val combinedProvider = object : AssemblableWrapperAssembler.BatchRefSourceDataProvider,
+            AssemblableWrapperAssembler.BatchListRefSourceDataProvider {
+            override fun <T : Any> loadBatch(
+                source: KClass<T>,
+                metadata: AssemblableWrapperAssembler.RefSourceFieldMetadata,
+                sourceFieldValues: Set<Any>
+            ): Map<Any, T> = emptyMap()
+
+            override fun <T : Any> loadListBatch(
+                target: KClass<T>,
+                targetFieldName: String,
+                sourceFieldValues: Set<Any>
+            ): Map<Any, List<T>> {
+                listBatchLoadCallCount++
+                assertEquals("merchantId", targetFieldName)
+                val allAccounts = listOf(account1, account2)
+                @Suppress("UNCHECKED_CAST")
+                return allAccounts
+                    .filter { sourceFieldValues.contains(it.merchantId) }
+                    .groupBy { it.merchantId } as Map<Any, List<T>>
+            }
+
+            override fun <S : Any, T : Any> mapList(source: List<S>, targetClass: KClass<T>): List<T> {
+                @Suppress("UNCHECKED_CAST")
+                return source as List<T>
+            }
+        }
+
+        val assembler = AssemblableWrapperAssembler()
+        val assembled = assembler.assembleBatch(wrappers, combinedProvider)
+
+        assertEquals(1, listBatchLoadCallCount, "反向批量加载应只调用一次")
+        assertEquals(3, assembled.size, "应返回3个 Wrapper")
+
+        assertEquals(java.math.BigDecimal("100.50"), assembled[0].balance, "wrapper1.balance 应匹配")
+        assertEquals(java.math.BigDecimal("500.00"), assembled[0].totalRecharge, "wrapper1.totalRecharge 应匹配")
+        assertEquals(java.math.BigDecimal("399.50"), assembled[0].totalConsume, "wrapper1.totalConsume 应匹配")
+        assertNotNull(assembled[0].account, "wrapper1.account 应被填充")
+
+        assertEquals(java.math.BigDecimal("200.00"), assembled[1].balance, "wrapper2.balance 应匹配")
+        assertEquals(java.math.BigDecimal("800.00"), assembled[1].totalRecharge, "wrapper2.totalRecharge 应匹配")
+        assertEquals(java.math.BigDecimal("600.00"), assembled[1].totalConsume, "wrapper2.totalConsume 应匹配")
+        assertNotNull(assembled[1].account, "wrapper2.account 应被填充")
+
+        assertEquals(java.math.BigDecimal.ZERO, assembled[2].balance, "wrapper3.balance 应为默认值")
+        assertEquals(java.math.BigDecimal.ZERO, assembled[2].totalRecharge, "wrapper3.totalRecharge 应为默认值")
+        assertEquals(java.math.BigDecimal.ZERO, assembled[2].totalConsume, "wrapper3.totalConsume 应为默认值")
+        assertEquals(null, assembled[2].account, "wrapper3.account 应为空")
+    }
+
     // ========== Helper ==========
 
     private fun <T : Any> assembleWithReferences(wrapper: T, references: Map<KClass<*>, Any>): T {
@@ -683,4 +805,38 @@ class AssemblableWrapperTest {
         @field:AssemblyBatchField(entityField = "tagIdList")
         var tagList: List<TagEntity>? = null,
     ) : EntityWithTagIds(id, name, tagIdList)
+
+    // ========== @AssemblyReverseField 测试实体 ==========
+
+    open class MerchantEntity(
+        open var id: Long = 0L,
+        open var name: String = "",
+    )
+
+    data class MerchantAccountEntity(
+        val id: Long,
+        val balance: java.math.BigDecimal,
+        val totalRecharge: java.math.BigDecimal,
+        val totalConsume: java.math.BigDecimal,
+        @AssemblyRefSource(source = MerchantEntity::class)
+        val merchantId: Long,
+    )
+
+    @AssemblableWrapper
+    class MerchantWithAccountWrapperEntity(
+        id: Long = 0L,
+        name: String = "",
+
+        @field:AssemblyReverseField(target = MerchantAccountEntity::class, sourceProperty = "balance")
+        var balance: java.math.BigDecimal = java.math.BigDecimal.ZERO,
+
+        @field:AssemblyReverseField(target = MerchantAccountEntity::class, sourceProperty = "totalRecharge")
+        var totalRecharge: java.math.BigDecimal = java.math.BigDecimal.ZERO,
+
+        @field:AssemblyReverseField(target = MerchantAccountEntity::class, sourceProperty = "totalConsume")
+        var totalConsume: java.math.BigDecimal = java.math.BigDecimal.ZERO,
+
+        @field:AssemblyReverseField(target = MerchantAccountEntity::class)
+        var account: MerchantAccountEntity? = null,
+    ) : MerchantEntity(id, name)
 }
