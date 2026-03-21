@@ -17,6 +17,7 @@ include(":core-bom")
 include(":core-plugin")
 include(":core-assembler-annotation")
 include(":core-assembler")
+include(":core-normalizer")
 
 pluginManagement {
     repositories {
