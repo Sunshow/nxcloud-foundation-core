@@ -22,6 +22,7 @@ dependencies {
         api(project(":core-universal-task"))
         api(project(":core-assembler-annotation"))
         api(project(":core-assembler"))
+        api(project(":core-normalizer"))
     }
 }
 
