@@ -20,6 +20,7 @@ NormalizeExtensions.normalizeFields()            ← 统一入口，反射扫描
 |------|---------|------|
 | `@NormalizeString` | `String` / `String?` | 字符串标准化，支持多个 action 按顺序执行 |
 | `@NormalizeList` | `List` / `List?` | 列表标准化，支持去重和排序 |
+| `@NormalizeDecimal` | `BigDecimal` / `BigDecimal?` | 数值标准化，支持精度控制、去尾零、取绝对值 |
 
 ### StringNormalizeAction
 
@@ -35,6 +36,19 @@ NormalizeExtensions.normalizeFields()            ← 统一入口，反射扫描
 |--------|------|
 | `DISTINCT` | 去重 |
 | `SORT` | 排序（按 `toString()` 字典序） |
+
+### DecimalNormalizeAction
+
+| Action | 说明 |
+|--------|------|
+| `STRIP_TRAILING_ZEROS` | 去除尾部多余的零 |
+| `SCALE_HALF_UP` | 四舍五入保留指定小数位（默认 2 位） |
+| `SCALE_HALF_DOWN` | 五舍六入保留指定小数位 |
+| `SCALE_FLOOR` | 向下取整保留指定小数位 |
+| `SCALE_CEILING` | 向上取整保留指定小数位 |
+| `ABS` | 取绝对值 |
+
+`@NormalizeDecimal` 注解额外支持 `scale` 参数（默认 2），用于 `SCALE_*` 系列 action。
 
 ## 使用示例
 
@@ -78,6 +92,23 @@ data class UserDto(
 
 val dto = UserDto(code = "  ABC-001  ").normalizeFields()
 // dto.code = "abc-001"
+```
+
+### 单字段处理
+
+只处理指定字段，其他字段不受影响：
+
+```kotlin
+import nxcloud.foundation.core.normalizer.NormalizeExtensions.normalizeField
+
+val dto = MerchantDto(code = "  ABC  ", name = "  Test  ")
+
+// 通过属性引用（类型安全，推荐）
+dto.normalizeField(MerchantDto::code)
+// dto.code = "abc", dto.name = "  Test  "（未处理）
+
+// 通过字段名
+dto.normalizeField("code")
 ```
 
 ## 自定义扩展

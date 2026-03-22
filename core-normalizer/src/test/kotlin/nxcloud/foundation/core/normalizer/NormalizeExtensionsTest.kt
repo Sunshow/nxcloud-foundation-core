@@ -1,13 +1,17 @@
 package nxcloud.foundation.core.normalizer
 
+import nxcloud.foundation.core.normalizer.NormalizeExtensions.normalizeField
 import nxcloud.foundation.core.normalizer.NormalizeExtensions.normalizeFields
+import nxcloud.foundation.core.normalizer.annotation.DecimalNormalizeAction
 import nxcloud.foundation.core.normalizer.annotation.FieldNormalizer
 import nxcloud.foundation.core.normalizer.annotation.ListNormalizeAction
+import nxcloud.foundation.core.normalizer.annotation.NormalizeDecimal
 import nxcloud.foundation.core.normalizer.annotation.NormalizeList
 import nxcloud.foundation.core.normalizer.annotation.NormalizeMarker
 import nxcloud.foundation.core.normalizer.annotation.NormalizeString
 import nxcloud.foundation.core.normalizer.annotation.StringNormalizeAction
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
@@ -177,6 +181,147 @@ internal class NormalizeExtensionsTest {
     fun testCustomReplaceHandler() {
         val dto = CustomReplaceDto(code = "abc-123_def").normalizeFields()
         assertEquals("abc123def", dto.code)
+    }
+
+    // endregion
+
+    // region Decimal tests
+
+    data class StripZerosDto(
+        @field:NormalizeDecimal(DecimalNormalizeAction.STRIP_TRAILING_ZEROS)
+        var amount: BigDecimal? = null,
+    )
+
+    data class ScaleHalfUpDto(
+        @field:NormalizeDecimal(DecimalNormalizeAction.SCALE_HALF_UP)
+        var amount: BigDecimal? = null,
+    )
+
+    data class ScaleHalfUpScale4Dto(
+        @field:NormalizeDecimal(DecimalNormalizeAction.SCALE_HALF_UP, scale = 4)
+        var amount: BigDecimal? = null,
+    )
+
+    data class ScaleHalfDownDto(
+        @field:NormalizeDecimal(DecimalNormalizeAction.SCALE_HALF_DOWN)
+        var amount: BigDecimal? = null,
+    )
+
+    data class ScaleFloorDto(
+        @field:NormalizeDecimal(DecimalNormalizeAction.SCALE_FLOOR)
+        var amount: BigDecimal? = null,
+    )
+
+    data class ScaleCeilingDto(
+        @field:NormalizeDecimal(DecimalNormalizeAction.SCALE_CEILING)
+        var amount: BigDecimal? = null,
+    )
+
+    data class AbsDto(
+        @field:NormalizeDecimal(DecimalNormalizeAction.ABS)
+        var amount: BigDecimal? = null,
+    )
+
+    data class DecimalComboDto(
+        @field:NormalizeDecimal(DecimalNormalizeAction.SCALE_HALF_UP, DecimalNormalizeAction.STRIP_TRAILING_ZEROS)
+        var amount: BigDecimal? = null,
+    )
+
+    @Test
+    fun testStripTrailingZeros() {
+        val dto = StripZerosDto(amount = BigDecimal("1.50000")).normalizeFields()
+        assertEquals(BigDecimal("1.5"), dto.amount)
+    }
+
+    @Test
+    fun testScaleHalfUpDefault() {
+        val dto = ScaleHalfUpDto(amount = BigDecimal("1.235")).normalizeFields()
+        assertEquals(BigDecimal("1.24"), dto.amount)
+    }
+
+    @Test
+    fun testScaleHalfUpCustomScale() {
+        val dto = ScaleHalfUpScale4Dto(amount = BigDecimal("1.23456789")).normalizeFields()
+        assertEquals(BigDecimal("1.2346"), dto.amount)
+    }
+
+    @Test
+    fun testScaleHalfDown() {
+        val dto = ScaleHalfDownDto(amount = BigDecimal("1.235")).normalizeFields()
+        assertEquals(BigDecimal("1.23"), dto.amount)
+    }
+
+    @Test
+    fun testScaleFloor() {
+        val dto = ScaleFloorDto(amount = BigDecimal("1.239")).normalizeFields()
+        assertEquals(BigDecimal("1.23"), dto.amount)
+    }
+
+    @Test
+    fun testScaleCeiling() {
+        val dto = ScaleCeilingDto(amount = BigDecimal("1.231")).normalizeFields()
+        assertEquals(BigDecimal("1.24"), dto.amount)
+    }
+
+    @Test
+    fun testAbs() {
+        val dto = AbsDto(amount = BigDecimal("-99.5")).normalizeFields()
+        assertEquals(BigDecimal("99.5"), dto.amount)
+    }
+
+    @Test
+    fun testDecimalCombo() {
+        val dto = DecimalComboDto(amount = BigDecimal("1.50000")).normalizeFields()
+        assertEquals(BigDecimal("1.5"), dto.amount)
+    }
+
+    @Test
+    fun testNullDecimalSkipped() {
+        val dto = StripZerosDto(amount = null).normalizeFields()
+        assertNull(dto.amount)
+    }
+
+    // endregion
+
+    // region Single field normalize
+
+    data class MultiFieldDto(
+        @field:NormalizeString(StringNormalizeAction.TRIM, StringNormalizeAction.LOWERCASE)
+        var code: String? = null,
+        @field:NormalizeString(StringNormalizeAction.TRIM)
+        var name: String? = null,
+    )
+
+    @Test
+    fun testNormalizeFieldByPropertyReference() {
+        val dto = MultiFieldDto(code = "  ABC  ", name = "  Test  ")
+        dto.normalizeField(MultiFieldDto::code)
+        assertEquals("abc", dto.code)
+        assertEquals("  Test  ", dto.name)
+    }
+
+    @Test
+    fun testNormalizeFieldByName() {
+        val dto = MultiFieldDto(code = "  ABC  ", name = "  Test  ")
+        dto.normalizeField("name")
+        assertEquals("  ABC  ", dto.code)
+        assertEquals("Test", dto.name)
+    }
+
+    @Test
+    fun testNormalizeFieldNullSkipped() {
+        val dto = MultiFieldDto(code = null, name = "  Test  ")
+        dto.normalizeField(MultiFieldDto::code)
+        assertNull(dto.code)
+        assertEquals("  Test  ", dto.name)
+    }
+
+    @Test
+    fun testNormalizeFieldNonAnnotatedFieldIgnored() {
+        val dto = MixedDto(name = "  hi  ", untouched = "  keep  ")
+        dto.normalizeField("untouched")
+        assertEquals("  hi  ", dto.name)
+        assertEquals("  keep  ", dto.untouched)
     }
 
     // endregion
