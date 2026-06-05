@@ -47,10 +47,10 @@ class SnowFlakeIdGenerator(
      * @throws IllegalStateException if some invariant has been broken, e.g. the clock moved backwards or a sequence overflow occurred
      */
     operator fun next(): Long {
-        val ticks = option.source.ticks
-        check(ticks >= 0) { "Clock gave negative ticks" }
-        val timestamp = ticks and maskTime
         synchronized(lock) {
+            val ticks = option.source.ticks
+            check(ticks >= 0) { "Clock gave negative ticks" }
+            val timestamp = ticks and maskTime
             // Guard against non-monotonic clocks
             check(timestamp >= lastTimestamp) { "Timestamp moved backwards or wrapped around" }
             if (timestamp == lastTimestamp) {
