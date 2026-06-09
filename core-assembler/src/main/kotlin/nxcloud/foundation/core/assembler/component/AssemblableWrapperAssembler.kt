@@ -93,6 +93,7 @@ class AssemblableWrapperAssembler {
         val property: KProperty1<*, *>,
         val sourceClass: KClass<*>,
         val sourceFieldName: String,
+        val scopeFieldNames: List<String> = emptyList(),
     )
 
     private val metadataCache = ConcurrentHashMap<KClass<*>, WrapperMetadata>()
@@ -384,6 +385,7 @@ class AssemblableWrapperAssembler {
                         property = property,
                         sourceClass = refSourceAnnotation.source,
                         sourceFieldName = refSourceAnnotation.sourceField,
+                        scopeFieldNames = refSourceAnnotation.scopeFields.toList(),
                     )
                 }
             }
@@ -393,6 +395,29 @@ class AssemblableWrapperAssembler {
     }
 
     // ==================== 公共 API ====================
+
+    /**
+     * 构建用于批量加载映射的查找键。
+     *
+     * 无 scopeFields 时返回裸外键值, 行为与历史一致;
+     * 有 scopeFields 时返回 [外键值, scope1, scope2...] 元组, scope 值取自主实体同名字段,
+     * 用于业务键非全局唯一(如 (tenantId, shipmentId))时做复合匹配, 避免跨作用域串号。
+     */
+    private fun buildLoadKey(
+        sourceEntity: Any,
+        metadata: RefSourceFieldMetadata,
+        fkValue: Any,
+    ): Any {
+        if (metadata.scopeFieldNames.isEmpty()) {
+            return fkValue
+        }
+        return buildList {
+            add(fkValue)
+            metadata.scopeFieldNames.forEach { scopeName ->
+                add(PropertyUtils.getProperty(sourceEntity, scopeName))
+            }
+        }
+    }
 
     fun <T : Any> assemble(wrapper: T, dataProvider: RefSourceDataProvider): T {
         val wrapperClass = wrapper::class
@@ -412,11 +437,15 @@ class AssemblableWrapperAssembler {
             .forEach { (_, fieldMetadata) ->
                 val sourceFieldValue = PropertyUtils.getProperty(sourceEntity, fieldMetadata.sourceField.property.name)
 
+                val loadKey = sourceFieldValue?.let {
+                    buildLoadKey(sourceEntity, fieldMetadata.sourceField, it)
+                }
+
                 val refEntity = dataProvider
                     .load(
                         source = fieldMetadata.sourceField.sourceClass,
                         metadata = fieldMetadata.sourceField,
-                        sourceFieldValue = sourceFieldValue,
+                        sourceFieldValue = loadKey,
                     )
 
                 if (refEntity != null) {
@@ -560,7 +589,7 @@ class AssemblableWrapperAssembler {
                     )
                     loadRequests
                         .getOrPut(key) { mutableSetOf() }
-                        .add(sourceFieldValue)
+                        .add(buildLoadKey(sourceEntity, fieldMetadata.sourceField, sourceFieldValue))
                 }
             }
 
@@ -580,7 +609,7 @@ class AssemblableWrapperAssembler {
                     sourceFieldValue.filterNotNull().forEach { id ->
                         loadRequests
                             .getOrPut(key) { mutableSetOf() }
-                            .add(id)
+                            .add(buildLoadKey(sourceEntity, batchFieldMetadata.sourceField, id))
                     }
                 }
             }
@@ -640,7 +669,8 @@ class AssemblableWrapperAssembler {
                         metadata = fieldMetadata.sourceField
                     )
 
-                    val refEntity = loadResult.loadedData[key]?.get(sourceFieldValue)
+                    val loadKey = buildLoadKey(sourceEntity, fieldMetadata.sourceField, sourceFieldValue)
+                    val refEntity = loadResult.loadedData[key]?.get(loadKey)
 
                     if (refEntity != null) {
                         val valueToSet = if (fieldMetadata.annotation.targetField.isNotEmpty()) {
@@ -671,7 +701,9 @@ class AssemblableWrapperAssembler {
                     if (loadedDataMap != null) {
                         val resultList = sourceFieldValue
                             .filterNotNull()
-                            .mapNotNull { id -> loadedDataMap[id] }
+                            .mapNotNull { id ->
+                                loadedDataMap[buildLoadKey(sourceEntity, batchFieldMetadata.sourceField, id)]
+                            }
 
                         PropertyUtils.setProperty(wrapper, batchFieldMetadata.property.name, resultList)
                     }

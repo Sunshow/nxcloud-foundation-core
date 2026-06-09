@@ -18,4 +18,9 @@ annotation class AssemblyRefSource(
      * 来源实体类型
      */
     val source: KClass<*>,
+
+    /**
+     * 额外的作用域匹配字段(主实体与目标实体同名), 用于业务键非全局唯一时(如 tenantId)复合匹配
+     */
+    val scopeFields: Array<String> = [],
 )
