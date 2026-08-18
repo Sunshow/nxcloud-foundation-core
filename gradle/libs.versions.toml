@@ -1,12 +1,11 @@
 [versions]
 org-jetbrains-kotlin = "2.0.21"
-org-springframework-boot = { prefer = "3.2.0" }
+org-springframework-boot = { prefer = "3.5.10" }
 jakarta-persistence = "3.1.0"
 kotlin-logging-jvm = "7.0.13"
 org-modelmapper = { prefer = "3.2.0" }
 org-glassfish-jakarta-el = "5.0.0-M1"
-org-hibernate = { prefer = "6.3.1.Final" }
-jsqlparser = "5.2"
+org-hibernate = { prefer = "6.6.41.Final" }
 org-pf4j = "3.12.1"
 commons-beanutils = { prefer = "1.11.0" }
 
@@ -20,7 +19,6 @@ kotlin-logging-jvm = { module = "io.github.oshai:kotlin-logging-jvm", version.re
 modelmapper = { module = "org.modelmapper:modelmapper", version.ref = "org-modelmapper" }
 jakarta-el = { module = "org.glassfish:jakarta.el", version.ref = "org-glassfish-jakarta-el" }
 hibernate-envers = { module = "org.hibernate:hibernate-envers", version.ref = "org-hibernate" }
-jsqlparser = { module = "com.github.jsqlparser:jsqlparser", version.ref = "jsqlparser" }
 pf4j = { module = "org.pf4j:pf4j", version.ref = "org-pf4j" }
 commons-beanutils = { module = "commons-beanutils:commons-beanutils", version.ref = "commons-beanutils" }
 

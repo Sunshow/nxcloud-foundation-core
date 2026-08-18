@@ -2,10 +2,10 @@ package nxcloud.foundation.core.spring.boot.autoconfigure.support
 
 import jakarta.annotation.PostConstruct
 import jakarta.persistence.EntityManagerFactory
-import nxcloud.foundation.core.data.jpa.context.EntityManagerInitializerHolder
 import nxcloud.foundation.core.data.jpa.event.SoftDeleteEventListener
 import nxcloud.foundation.core.data.jpa.interceptor.EmptyJpaSessionFactoryInterceptor
 import nxcloud.foundation.core.data.jpa.repository.support.JpaEntitySupporter
+import nxcloud.foundation.core.data.jpa.softdelete.HibernateSoftDeleteEntityManagerInitializer
 import nxcloud.foundation.core.spring.support.context.SpringContextHelper
 import org.hibernate.engine.spi.SessionImplementor
 import org.hibernate.event.service.spi.EventListenerRegistry
@@ -17,9 +17,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer
-import org.springframework.boot.autoconfigure.transaction.TransactionManagerCustomizer
+import org.springframework.beans.factory.config.BeanPostProcessor
 import org.springframework.context.annotation.Bean
-import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.stereotype.Component
 
 
@@ -36,15 +35,6 @@ class NXSpringDataJpaAutoConfiguration {
 //                "nxcloud.foundation.core.data.jpa.id.DeployContextIdentifierGeneratorStrategyProvider"
 //        }
 //    }
-
-    @Bean
-    @ConditionalOnMissingBean(name = ["advancedStatementInspectorHibernatePropertiesCustomizer"])
-    fun advancedStatementInspectorHibernatePropertiesCustomizer(): HibernatePropertiesCustomizer {
-        return HibernatePropertiesCustomizer {
-            it["hibernate.session_factory.statement_inspector"] =
-                "nxcloud.foundation.core.data.jpa.repository.jdbc.AdvancedStatementInspector"
-        }
-    }
 
     @Bean
     @ConditionalOnMissingBean
@@ -67,15 +57,16 @@ class NXSpringDataJpaAutoConfiguration {
     }
 
     @Bean
-    fun jpaTransactionManagerCustomizer(): TransactionManagerCustomizer<JpaTransactionManager> {
-        return TransactionManagerCustomizer<JpaTransactionManager> {
-            it.setEntityManagerInitializer {
-                EntityManagerInitializerHolder.get()
-                    .forEach { initializer ->
-                        initializer(it)
-                    }
-            }
-        }
+    @ConditionalOnMissingBean
+    fun hibernateSoftDeleteEntityManagerInitializer(): HibernateSoftDeleteEntityManagerInitializer {
+        return HibernateSoftDeleteEntityManagerInitializer()
+    }
+
+    @Bean
+    fun hibernateSoftDeleteEntityManagerFactoryBeanPostProcessor(
+        softDeleteInitializer: HibernateSoftDeleteEntityManagerInitializer,
+    ): BeanPostProcessor {
+        return HibernateSoftDeleteEntityManagerFactoryBeanPostProcessor(softDeleteInitializer)
     }
 
 //    @Bean

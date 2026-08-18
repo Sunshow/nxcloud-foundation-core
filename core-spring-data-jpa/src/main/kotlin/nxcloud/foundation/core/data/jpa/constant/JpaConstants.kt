@@ -14,4 +14,8 @@ object JpaConstants {
 
     const val FILTER_DELETED_AFTER = "NX_FILTER_DELETED_AFTER"
 
+    const val FILTER_PARAMETER_DELETED_AFTER = "deletedAfter"
+
+    const val FILTER_PARAMETER_DELETED_BEFORE = "deletedBefore"
+
 }
